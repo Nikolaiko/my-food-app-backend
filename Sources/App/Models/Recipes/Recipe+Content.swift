@@ -19,6 +19,7 @@ extension FoodRecipe: Content {
         try container.encode(description, forKey: .description)
         try container.encode(shortDescription, forKey: .shortDescription)
         try container.encode(tags, forKey: .tags)
+        try container.encode(products, forKey: .products)
     }
     
     public init(from decoder: Decoder) throws {
@@ -28,8 +29,13 @@ extension FoodRecipe: Content {
         let description = try values.decode(String.self, forKey: .description)
         let shortDescription = try values.decode(String.self, forKey: .shortDescription)
         let tags = try values.decode([Int].self, forKey: .tags)
-        //let products = try values.decode([FoodRecipeProductEntry].self, forKey: .products)
+        let products = try values.decode([FoodRecipeProductEntry].self, forKey: .products)
 
-        self.init(id: id, name: name, shortDescription: shortDescription, description: description, products: [], tags: tags)
+        self.init(id: id,
+                  name: name,
+                  shortDescription: shortDescription,
+                  description: description,
+                  products: products,
+                  tags: tags)
     }
 }
