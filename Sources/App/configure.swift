@@ -1,20 +1,22 @@
 import Vapor
 import Fluent
 import FluentMongoDriver
+import FluentPostgresDriver
 
 // configures your application
 public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
-
-    //to access in docker docker exec -it docker-container-name mongosh
     // register database
-    do {
-        try app.databases.use(.mongo(connectionString: "mongodb://root:root@localhost:27017/products-db"), as: .mongo)
-    } catch {
-        print("Error : \(error)")
-    }
+    app.databases.use(.postgres(hostname: "localhost", username: "root", password: "root", database: "products"), as: .psql)
+
+
+    // to access in docker docker exec -it docker-container-name mongosh
+    // try app.databases.use(.mongo(connectionString: "mongodb://localhost:10808/products-db"), as: .mongo)
+
+    // Migrations
+    app.migrations.add(CreateDBSchema())
 
 
     // register routes
