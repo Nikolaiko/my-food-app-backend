@@ -17,6 +17,7 @@ public func configure(_ app: Application) async throws {
 
     // Migrations
     app.migrations.add(CreateDBSchema())
+    app.migrations.add(AddInitialRecipes())
 
 
     // register routes
