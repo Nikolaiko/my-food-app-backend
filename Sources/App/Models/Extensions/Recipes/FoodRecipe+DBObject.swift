@@ -12,4 +12,13 @@ extension FoodRecipe {
             tags: []
         )
     }
+
+    func toDBObject() -> DBRecipeEntry {
+        DBRecipeEntry(
+            id: self.id.isEmpty ? nil : UUID(uuidString: self.id),
+            name: self.name,
+            description: self.description,
+            shortDescription: self.shortDescription
+        )
+    }
 }

@@ -4,6 +4,7 @@ import Vapor
 enum CommonRequestError: Error {
     case notFound
     case unableToGetParameter(String)
+    case unableToParseParameter(String)
 }
 
 extension CommonRequestError: AbortError {
@@ -11,6 +12,8 @@ extension CommonRequestError: AbortError {
         switch self {
         case .unableToGetParameter(let parameterName):
             return "Unable to get parameter: \(parameterName) from request"
+        case .unableToParseParameter(let parameterName):
+            return "Unable to parse parameter: \(parameterName) from request"
         case .notFound:
             return "Needed object not found"
         }
@@ -19,8 +22,9 @@ extension CommonRequestError: AbortError {
         switch self {
         case .notFound:
             return .notFound
-        case .unableToGetParameter(_):
-            return .internalServerError
+        case .unableToGetParameter(_),
+             .unableToParseParameter(_):
+            return .badRequest
         }
     }
 }

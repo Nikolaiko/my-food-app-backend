@@ -3,14 +3,29 @@ import Fluent
 import FluentMongoDriver
 import FluentPostgresDriver
 
-// configures your application
 public func configure(_ app: Application) async throws {
-    // uncomment to serve files from /Public folder
-    // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
+    let databaseName: String
+    let databasePort: Int
 
-    // register database
-    app.databases.use(.postgres(hostname: "localhost", username: "root", password: "root", database: "products"), as: .psql)
+    if (app.environment == .testing) {
+      databaseName = testDatabaseName
+      databasePort = testDatabasePort
+    } else {
+      databaseName = productionDatabaseName
+      databasePort = productionDatabasePort
+    }
 
+    app.databases.use(.postgres(
+      hostname: Environment.get("DATABASE_HOST")
+        ?? "localhost",
+      port: databasePort,
+      username: Environment.get("DATABASE_USERNAME")
+        ?? "root",
+      password: Environment.get("DATABASE_PASSWORD")
+        ?? "root",
+      database: Environment.get("DATABASE_NAME")
+        ?? databaseName
+    ), as: .psql)
 
     // to access in docker docker exec -it docker-container-name mongosh
     // try app.databases.use(.mongo(connectionString: "mongodb://localhost:10808/products-db"), as: .mongo)
