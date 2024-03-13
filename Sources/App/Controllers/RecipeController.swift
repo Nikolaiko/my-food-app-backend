@@ -72,19 +72,28 @@ class RecipeController: RouteCollection {
             throw CommonRequestError.unableToParseParameter(ParameterNames.recipeInBody)
         }
 
-        try await request.db.transaction { currentDb in
+        return try await request.db.transaction { currentDb in
             let dbRecipe = parsedRecipe.toDBObject()
-
             try await dbRecipe.save(on: currentDb)
 
             let dbProductEntries = parsedRecipe.products.map { $0.toDBObject(parentRecipe: dbRecipe) }
-
             for currentEntry in dbProductEntries {
                 try await currentEntry.save(on: currentDb)
             }
-        }
 
-        return parsedRecipe
+            var productItemsWithId: [FoodRecipeProductEntry] = []
+            for index in (0..<dbProductEntries.count) {
+                productItemsWithId.append(
+                    parsedRecipe.products[index].copy(newId: dbProductEntries[index].id?.uuidString)
+                )
+            }
+
+            let recipeWithId = parsedRecipe.copy(
+                newId: dbRecipe.id?.uuidString,
+                newProducts: productItemsWithId
+            )
+            return recipeWithId
+        }
     }
 }
 

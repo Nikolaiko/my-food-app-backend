@@ -6,29 +6,29 @@ struct AddInitialRecipes: AsyncMigration {
     func prepare(on database: FluentKit.Database) async throws {
         try await database.transaction { currentDatabase in
             let vegtableSalad = DBRecipeEntry(
-                name: AddInitialRecipes.RecipesData.recipeOneName,
-                description: AddInitialRecipes.RecipesData.recipeOneDescription,
-                shortDescription: AddInitialRecipes.RecipesData.recipeOneShortDescription
+                name: InitialDBData.recipeOneName,
+                description: InitialDBData.recipeOneDescription,
+                shortDescription: InitialDBData.recipeOneShortDescription
             )
             try await vegtableSalad.save(on: currentDatabase)
 
 
             let tomatoForSalad = DBRecipeProductEntry(
-                count: 4,
+                count: InitialDBData.initialTomatoCount,
                 productType: .tomato,
-                quantityMeasure: FoodQuantityType.item.rawValue,
+                quantityMeasure: InitialDBData.initialTomatoQuantityType.rawValue,
                 recipe: vegtableSalad.id!)
 
             let cucumberForSalad = DBRecipeProductEntry(
-                count: 1,
+                count: InitialDBData.initialCucmberCount,
                 productType: .cucumber,
-                quantityMeasure: FoodQuantityType.item.rawValue,
+                quantityMeasure: InitialDBData.initialCucmberQuantityType.rawValue,
                 recipe: vegtableSalad.id!)
 
             let sourCreamForSalad = DBRecipeProductEntry(
-                count: 300,
+                count: InitialDBData.initialCreamCount,
                 productType: .sourcream,
-                quantityMeasure: FoodQuantityType.weight.rawValue,
+                quantityMeasure: InitialDBData.initialCreamQuantityType.rawValue,
                 recipe: vegtableSalad.id!)
 
             try await tomatoForSalad.save(on: currentDatabase)
@@ -40,17 +40,9 @@ struct AddInitialRecipes: AsyncMigration {
     func revert(on database: FluentKit.Database) async throws {
         try await DBRecipeEntry
             .query(on: database)
-            .filter(\.$name == AddInitialRecipes.RecipesData.recipeOneName)
-            .filter(\.$shortDescription == AddInitialRecipes.RecipesData.recipeOneShortDescription)
-            .filter(\.$description == AddInitialRecipes.RecipesData.recipeOneDescription)
+            .filter(\.$name == InitialDBData.recipeOneName)
+            .filter(\.$shortDescription == InitialDBData.recipeOneShortDescription)
+            .filter(\.$description == InitialDBData.recipeOneDescription)
             .delete()        
-    }
-}
-
-private extension AddInitialRecipes {
-    enum RecipesData {
-        static let recipeOneName = "Овощной салат"
-        static let recipeOneDescription = "Очень вкусное и простое, классическое блюдо"
-        static let recipeOneShortDescription = "Попсовый салат"
     }
 }

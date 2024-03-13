@@ -20,4 +20,18 @@ extension FoodRecipeProductEntry {
             recipe: parentRecipe.id!
         )
     }
+
+    func copy(
+        newId: String? = nil,
+        newCount: Int? = nil,
+        newProductType: FoodProductType? = nil,
+        newQuantityMeasureType: FoodQuantityType? = nil
+    ) -> FoodRecipeProductEntry {
+        FoodRecipeProductEntry(
+            id: newId ?? id,
+            productType: newProductType ?? productType,
+            count: newCount ?? count,
+            quantityMeasure: newQuantityMeasureType ?? quantityMeasure
+        )
+    }
 }

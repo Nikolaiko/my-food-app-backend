@@ -21,4 +21,22 @@ extension FoodRecipe {
             shortDescription: self.shortDescription
         )
     }
+
+    func copy(
+        newId: String? = nil,
+        newName: String? = nil,
+        newShortDescription: String? = nil,
+        newDescription: String? = nil,
+        newTags: [Int]? = nil,
+        newProducts: [FoodRecipeProductEntry]? = nil
+    ) -> FoodRecipe {
+        FoodRecipe(
+            id: newId ?? id,
+            name: newName ?? name,
+            shortDescription: newShortDescription ?? shortDescription,
+            description: newDescription ?? description,
+            products: newProducts ?? products,
+            tags: newTags ?? tags
+        )
+    }
 }
