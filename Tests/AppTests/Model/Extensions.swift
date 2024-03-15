@@ -1,6 +1,7 @@
 import Foundation
 import XCTVapor
 import App
+import Model
 
 extension Application {
   static func testable() async throws -> Application {

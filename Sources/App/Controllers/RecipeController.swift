@@ -48,6 +48,13 @@ class RecipeController: RouteCollection {
         }
 
         try await request.db.transaction { currentDb in
+            guard let oldRecipe = try await DBRecipeEntry
+                .query(on: currentDb)
+                .filter(\.$id == uuid)
+                .first() else {
+                throw CommonRequestError.notFound
+            }
+
             try await DBRecipeEntry
                 .query(on: currentDb)
                 .filter(\.$id == uuid)
@@ -95,6 +102,7 @@ class RecipeController: RouteCollection {
             return recipeWithId
         }
     }
+
 }
 
 private extension RecipeController {
