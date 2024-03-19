@@ -8,23 +8,19 @@ public func configure(_ app: Application) async throws {
     let databasePort: Int
 
     if (app.environment == .testing) {
-      databaseName = testDatabaseName
-      databasePort = testDatabasePort
+        databaseName = testDatabaseName
+        databasePort = testDatabasePort
     } else {
-      databaseName = productionDatabaseName
-      databasePort = productionDatabasePort
+        databaseName = productionDatabaseName
+        databasePort = productionDatabasePort
     }
 
     app.databases.use(.postgres(
-      hostname: Environment.get("DATABASE_HOST")
-        ?? "localhost",
-      port: databasePort,
-      username: Environment.get("DATABASE_USERNAME")
-        ?? "root",
-      password: Environment.get("DATABASE_PASSWORD")
-        ?? "root",
-      database: Environment.get("DATABASE_NAME")
-        ?? databaseName
+        hostname: Environment.get("DATABASE_HOST") ?? "localhost",
+        port: databasePort,
+        username: Environment.get("DATABASE_USERNAME") ?? "root",
+        password: Environment.get("DATABASE_PASSWORD") ?? "root",
+        database: Environment.get("DATABASE_NAME") ?? databaseName
     ), as: .psql)
 
     // to access in docker docker exec -it docker-container-name mongosh
