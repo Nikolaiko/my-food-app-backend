@@ -10,6 +10,7 @@ final class RecipeModifyTests: XCTestCase {
 
         try app.test(.POST, "/recipes/add") { preRequest in
             try preRequest.content.encode(RecipesTestData.testRecipe)
+            preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
         } afterResponse: { addResponse in
             XCTAssertEqual(addResponse.status, .ok)
 
@@ -30,6 +31,7 @@ final class RecipeModifyTests: XCTestCase {
 
             try app.test(.PUT, "/recipes") { inputRequest in
                 try inputRequest.content.encode(newRecipe)
+                inputRequest.headers.add(name: authHeaderName, value: headerAuthValue)
             } afterResponse: { modifyedRecipe in
                 XCTAssertEqual(modifyedRecipe.status, .ok)
 
@@ -62,6 +64,7 @@ final class RecipeModifyTests: XCTestCase {
 
         try app.test(.PUT, "/recipes") { preRequest in
             try preRequest.content.encode(newRecipe)
+            preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
         } afterResponse: { afterRequest in
             XCTAssert(
                 afterRequest.status == .notFound,
@@ -76,6 +79,7 @@ final class RecipeModifyTests: XCTestCase {
 
         try app.test(.PUT, "/recipes") { preRequest in
             try preRequest.content.encode(RecipesTestData.testDummyEntity)
+            preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
         } afterResponse: { afterRequest in
             XCTAssert(
                 afterRequest.status == .badRequest,
@@ -83,4 +87,41 @@ final class RecipeModifyTests: XCTestCase {
             )
         }
     }
+
+    func testModifyByIdAuthError() async throws {
+        let app = try await Application.testable()
+
+        try app.test(.POST, "/recipes/add") { preRequest in
+            try preRequest.content.encode(RecipesTestData.testRecipe)
+            preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
+        } afterResponse: { addResponse in
+            XCTAssertEqual(addResponse.status, .ok)
+
+            guard let initialRecipe = try? addResponse.content.decode(FoodRecipe.self) else {
+                XCTFail("Unable to parse response after add recipe")
+                return
+            }
+
+
+            let newRecipe = initialRecipe.copy(
+                newName: RecipesTestData.newName,
+                newDescription: RecipesTestData.newDescription,
+                newProducts: [
+                    RecipesTestData.newFirstProductItem,
+                    RecipesTestData.newSecondProductItem
+                ]
+            )
+
+            try app.test(.PUT, "/recipes") { inputRequest in
+                try inputRequest.content.encode(newRecipe)
+            } afterResponse: { modifyedRecipe in
+                XCTAssertEqual(
+                    modifyedRecipe.status,
+                    .unauthorized,
+                    "Ожидаемый статус: \(HTTPStatus.badRequest), полученный: \(modifyedRecipe.status)"
+                )
+            }
+        }
+    }
+
 }

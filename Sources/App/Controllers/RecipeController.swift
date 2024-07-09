@@ -22,6 +22,7 @@ class RecipeController: RouteCollection {
     }
 
     private func getRecipeById(request: Request) async throws -> FoodRecipe {
+        try checkAuthorization(request: request)
         guard let recipeId = request.parameters.get(ParameterNames.requestIdParameterName),
               let uuid = UUID(uuidString: recipeId) else {
             throw CommonRequestError.unableToGetParameter(ParameterNames.requestIdParameterName)
@@ -33,10 +34,12 @@ class RecipeController: RouteCollection {
     }
 
     private func getAllRecipes(request: Request) async throws -> [FoodRecipeShortInfo] {
+        try checkAuthorization(request: request)
         return try await provider.getAllRecipes(db: request.db)
     }
 
     private func updateRecipeById(request: Request) async throws -> FoodRecipe {
+        try checkAuthorization(request: request)
         guard let parsedRecipe = try? request.content.decode(FoodRecipe.self),
               let uuid = UUID(uuidString: parsedRecipe.id) else {
             throw CommonRequestError.unableToParseParameter(ParameterNames.recipeInBody)
@@ -50,6 +53,7 @@ class RecipeController: RouteCollection {
     }
 
     private func addRecipe(request: Request) async throws -> FoodRecipe {
+        try checkAuthorization(request: request)
         guard let parsedRecipe = try? request.content.decode(FoodRecipe.self) else {
             throw CommonRequestError.unableToParseParameter(ParameterNames.recipeInBody)
         }
@@ -57,6 +61,13 @@ class RecipeController: RouteCollection {
             newRecipe: parsedRecipe,
             db: request.db
         )
+    }
+
+    private func checkAuthorization(request: Request) throws {
+        let headerValues = request.headers[authHeaderName]
+        guard headerValues.count == 1,
+              let token = headerValues.first,
+              token == headerAuthValue else { throw CommonRequestError.notAuthotized }
     }
 
 }

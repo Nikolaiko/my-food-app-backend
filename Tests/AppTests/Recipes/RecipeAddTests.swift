@@ -11,6 +11,7 @@ final class RecipeAddTests: XCTestCase {
 
         try app.test(.POST, "/recipes/add") { preRequest in
             try preRequest.content.encode(RecipesTestData.testRecipe)
+            preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
         } afterResponse: { addResponse in
             XCTAssertEqual(addResponse.status, .ok)
 
@@ -38,12 +39,27 @@ final class RecipeAddTests: XCTestCase {
         }
     }
 
+    func testAddRecipeNotAuthError() async throws {
+        let app = try await Application.testable()
+        defer { app.shutdown() }
+
+        try app.test(.POST, "/recipes/add") { preRequest in
+            try preRequest.content.encode(RecipesTestData.testRecipe)
+        } afterResponse: { afterRequest in
+            XCTAssert(
+                afterRequest.status == .unauthorized,
+                "Ожидаемый статус: \(HTTPStatus.badRequest), полученный: \(afterRequest.status)"
+            )
+        }
+    }
+
     func testAddRecipeBadRequestError() async throws {
         let app = try await Application.testable()
         defer { app.shutdown() }
 
         try app.test(.POST, "/recipes/add") { preRequest in
             try preRequest.content.encode(RecipesTestData.testDummyEntity)
+            preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
         } afterResponse: { afterRequest in
             XCTAssert(
                 afterRequest.status == .badRequest,

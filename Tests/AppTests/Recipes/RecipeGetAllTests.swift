@@ -9,7 +9,9 @@ final class RecipeGetAllTests: XCTestCase {
         let app = try await Application.testable()
         defer { app.shutdown() }
 
-        try app.test(.GET, "/recipes", afterResponse: { response in
+        try app.test(.GET, "/recipes", beforeRequest: { preRequest in
+            preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
+        }, afterResponse: { response in
             XCTAssertEqual(response.status, .ok)
 
             let recipes = try response.content.decode([FoodRecipeShortInfo].self)
@@ -23,6 +25,19 @@ final class RecipeGetAllTests: XCTestCase {
             XCTAssertEqual(initialRecipe.name, InitialDBData.recipeOneName)
             XCTAssertEqual(initialRecipe.shortDescription, InitialDBData.recipeOneShortDescription)
             XCTAssertTrue(initialRecipe.tags.isEmpty)
+        })
+    }
+
+    func testGetAllRecipesNotAuthError() async throws {
+        let app = try await Application.testable()
+        defer { app.shutdown() }
+
+        try app.test(.GET, "/recipes", afterResponse: { response in
+            XCTAssertEqual(
+                response.status,
+                .unauthorized,
+                "Ожидаемый статус: \(HTTPStatus.badRequest), полученный: \(response.status)"
+            )
         })
     }
 }

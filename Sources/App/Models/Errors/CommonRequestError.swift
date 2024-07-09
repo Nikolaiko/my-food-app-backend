@@ -3,6 +3,7 @@ import Vapor
 
 enum CommonRequestError: Error {
     case notFound
+    case notAuthotized
     case unableToGetParameter(String)
     case unableToParseParameter(String)
 }
@@ -16,10 +17,14 @@ extension CommonRequestError: AbortError {
             return "Unable to parse parameter: \(parameterName) from request"
         case .notFound:
             return "Needed object not found"
+        case .notAuthotized:
+            return "Not Authorized"
         }
     }
     var status: HTTPResponseStatus {
         switch self {
+        case .notAuthotized:
+            return .unauthorized
         case .notFound:
             return .notFound
         case .unableToGetParameter(_),
