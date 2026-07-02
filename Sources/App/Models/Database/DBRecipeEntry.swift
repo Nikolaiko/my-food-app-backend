@@ -1,7 +1,7 @@
 import Foundation
 import Fluent
 
-final class DBRecipeEntry: Model {
+final class DBRecipeEntry: Model,  @unchecked Sendable {
     static let schema: String = "recipe"
 
     @ID(key: .id)

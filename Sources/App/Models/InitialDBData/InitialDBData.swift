@@ -1,5 +1,5 @@
 import Foundation
-import Model
+@preconcurrency import Model
 
 enum InitialDBData {
     static let recipeOneName = "Овощной салат"

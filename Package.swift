@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.2
 import PackageDescription
 
 let package = Package(
@@ -7,10 +7,12 @@ let package = Package(
        .macOS(.v13)
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.89.0"),
-        .package(url: "https://github.com/vapor/fluent.git", from: "4.0.0"),
-        .package(url: "https://github.com/vapor/fluent-mongo-driver.git", from: "1.3.1"),
-        .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.0.0"),        
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.115.0"),
+        .package(url: "https://github.com/apple/swift-nio.git", from: "2.65.0"),
+
+        .package(url: "https://github.com/vapor/fluent.git", from: "4.13.0"),
+        .package(url: "https://github.com/vapor/fluent-mongo-driver.git", from: "1.4.0"),
+        .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.12.0"),
         .package(url: "https://github.com/Nikolaiko/my-foodapp-models", .upToNextMajor(from: "1.0.0")),
     ],
     targets: [

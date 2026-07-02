@@ -1,8 +1,8 @@
 import Foundation
 import Fluent
-import Model
+@preconcurrency import Model
 
-final class DBRecipeProductEntry: Model {
+final class DBRecipeProductEntry: Model,  @unchecked Sendable {
     static let schema = "recipe-product-entry"
 
     @ID(key: .id)

@@ -30,6 +30,8 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateDBSchema())
     app.migrations.add(AddInitialRecipes())
 
+    try await app.autoMigrate()
+
 
     // register routes
     try routes(app)
