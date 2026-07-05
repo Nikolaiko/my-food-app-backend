@@ -76,5 +76,6 @@ private extension RecipeController {
     enum ParameterNames {
         static let requestIdParameterName = "recipeId"
         static let recipeInBody = "recipe from body"
+        static let qrDataInBody = "qr data from body"
     }
 }

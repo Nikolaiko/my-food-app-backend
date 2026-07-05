@@ -4,6 +4,9 @@ import Vapor
 enum CommonRequestError: Error {
     case notFound
     case notAuthotized
+    case urlError
+    case emptyResponse
+    case wrongStatusCode(Int)
     case unableToGetParameter(String)
     case unableToParseParameter(String)
 }
@@ -19,6 +22,12 @@ extension CommonRequestError: AbortError {
             return "Needed object not found"
         case .notAuthotized:
             return "Not Authorized"
+        case .urlError:
+            return "Error parsing url"
+        case .emptyResponse:
+            return "No data"
+        case .wrongStatusCode(let code):
+            return "Wrong response status: \(code)"
         }
     }
     var status: HTTPResponseStatus {
@@ -27,9 +36,12 @@ extension CommonRequestError: AbortError {
             return .unauthorized
         case .notFound:
             return .notFound
-        case .unableToGetParameter(_),
-             .unableToParseParameter(_):
+        case .unableToGetParameter(_), .unableToParseParameter(_):
             return .badRequest
+        case .urlError, .emptyResponse:
+            return .internalServerError
+        case .wrongStatusCode(let code):
+            return HTTPResponseStatus(statusCode: code)
         }
     }
 }
