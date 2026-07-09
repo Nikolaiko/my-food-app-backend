@@ -1,22 +1,19 @@
-# Docker Compose file for Vapor
+# Docker Compose для продакшн-деплоя на VPS.
 #
-# Install Docker on your system to run and test
-# your Vapor app in a production-like environment.
+# Первый запуск:  docker compose up -d --build
+# Обновление:     git pull && docker compose up -d --build
+# Логи:           docker compose logs -f app
+# Остановить:     docker compose down   (данные БД сохраняются в volume)
 #
-# Note: This file is intended for testing and does not
-# implement best practices for a production deployment.
-#
-# Learn more: https://docs.docker.com/compose/reference/
-#
-#   Build images: docker-compose build
-#      Start app: docker-compose up app
-#       Stop all: docker-compose down
-#
-version: '3.7'
+# Секреты берутся из файла .env рядом (не коммитится). См. .env.example.
 
 x-shared_environment: &shared_environment
-  LOG_LEVEL: ${LOG_LEVEL:-debug}
-  
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  DATABASE_HOST: db
+  DATABASE_NAME: ${DATABASE_NAME}
+  DATABASE_USERNAME: ${DATABASE_USERNAME}
+  DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+
 services:
   app:
     image: my-food-app-backend:latest
@@ -24,7 +21,32 @@ services:
       context: .
     environment:
       <<: *shared_environment
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - '8080:8080'
-    # user: '0' # uncomment to run as root for testing purposes even though Dockerfile defines 'vapor' user.
+    restart: unless-stopped
     command: ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port", "8080"]
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${DATABASE_USERNAME} -d $${DATABASE_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    # Порт наружу НЕ пробрасываем — БД доступна только приложению внутри сети.
+    # Для отладки с самого VPS можно временно раскомментировать:
+    # ports:
+    #   - '127.0.0.1:5432:5432'
+
+volumes:
+  db_data:

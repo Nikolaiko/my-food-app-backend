@@ -1,5 +1,5 @@
 {
-  "originHash" : "ae3dac2e839e42cd9103ca545f8ae2966a10c07bb8e6787f0bab27cccf134bea",
+  "originHash" : "0e14c04ed89b5d86ad4e3788ef264dc1da000abdc7653f36458d3306bf75f580",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -98,6 +98,15 @@
       "state" : {
         "revision" : "3498e60218e6003894ff95192d756e238c01f44e",
         "version" : "4.7.1"
+      }
+    },
+    {
+      "identity" : "my-foodapp-models",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Nikolaiko/my-foodapp-models.git",
+      "state" : {
+        "revision" : "a8cd15191818345e384f4da7112733b4d366efdd",
+        "version" : "1.0.4"
       }
     },
     {
