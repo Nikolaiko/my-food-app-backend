@@ -13,7 +13,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent.git", from: "4.13.0"),
         .package(url: "https://github.com/vapor/fluent-mongo-driver.git", from: "1.4.0"),
         .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.12.0"),
-        .package(url: "https://github.com/Nikolaiko/my-foodapp-models.git", .upToNextMajor(from: "1.0.4")),
+        .package(url: "https://github.com/Nikolaiko/my-foodapp-models.git", .upToNextMajor(from: "1.0.5")),
     ],
     targets: [
         .executableTarget(
