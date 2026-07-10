@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 struct QRDataParsingNetworkService {
     typealias Response = (data: Data, response: URLResponse)
