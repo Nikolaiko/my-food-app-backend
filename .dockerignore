@@ -1,2 +1,9 @@
 .build/
 .swiftpm/
+.git/
+.github/
+.env
+.env.*
+docker-compose.yml
+README.md
+LICENSE
