@@ -60,7 +60,7 @@ struct SimpleProductsParser {
         return FoodProduct.init(
             id: UUID().uuidString,
             name: item.name,
-            quantity: Int(ceil(item.quantity)),
+            quantity: Float(ceil(item.quantity)),
             quantityType: .unknown,
             type: parsedType,
             date: Date()

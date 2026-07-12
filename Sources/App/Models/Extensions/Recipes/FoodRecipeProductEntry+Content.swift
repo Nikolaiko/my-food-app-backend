@@ -21,7 +21,7 @@ extension FoodRecipeProductEntry: Content, @unchecked Sendable {
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         let id = try values.decode(String.self, forKey: .id)
-        let count = try values.decode(Int.self, forKey: .count)
+        let count = try values.decode(Float.self, forKey: .count)
 
         let stringProductType = try values.decode(String.self, forKey: .productType)
         let productType = FoodProductType(rawValue: stringProductType)

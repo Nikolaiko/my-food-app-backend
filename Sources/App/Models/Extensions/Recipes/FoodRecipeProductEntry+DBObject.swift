@@ -23,7 +23,7 @@ extension FoodRecipeProductEntry {
 
     func copy(
         newId: String? = nil,
-        newCount: Int? = nil,
+        newCount: Float? = nil,
         newProductType: FoodProductType? = nil,
         newQuantityMeasureType: FoodQuantityType? = nil
     ) -> FoodRecipeProductEntry {

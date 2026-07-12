@@ -23,16 +23,12 @@ public func configure(_ app: Application) async throws {
         database: Environment.get("DATABASE_NAME") ?? databaseName
     ), as: .psql)
 
-    // to access in docker docker exec -it docker-container-name mongosh
-    // try app.databases.use(.mongo(connectionString: "mongodb://localhost:10808/products-db"), as: .mongo)
-
     // Migrations
     app.migrations.add(CreateDBSchema())
     app.migrations.add(AddInitialRecipes())
+    app.migrations.add(ChangeQuantityToFloat())
 
     try await app.autoMigrate()
 
-
-    // register routes
     try routes(app)
 }

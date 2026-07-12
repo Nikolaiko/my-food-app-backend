@@ -9,7 +9,7 @@ final class DBRecipeProductEntry: Model,  @unchecked Sendable {
     var id: UUID?
 
     @Field(key: "count")
-    var count: Int
+    var count: Float
 
     @Enum(key: "productType")
     var productType: FoodProductType
@@ -23,7 +23,7 @@ final class DBRecipeProductEntry: Model,  @unchecked Sendable {
     init() { }
 
     init(id: UUID? = nil,
-         count: Int,
+         count: Float,
          productType: FoodProductType,
          quantityMeasure: Int,
          recipe: DBRecipeEntry.IDValue
