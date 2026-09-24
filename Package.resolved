@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Nikolaiko/my-foodapp-models.git",
       "state" : {
-        "revision" : "b5e09eb4be6889e507c1a782ecf046f6408a2068",
-        "version" : "1.0.7"
+        "revision" : "6fe371d3f2237f4ae7c5954da47455865c8119d5",
+        "version" : "1.0.8"
       }
     },
     {
