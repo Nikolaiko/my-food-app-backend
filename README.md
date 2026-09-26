@@ -9,9 +9,9 @@
 Хранит рецепты и по данным QR-кода кассового чека ФНС возвращает список
 купленных продуктов.
 
-Стек: **Swift 6.2**, **Vapor 4**, **Fluent** + **PostgreSQL**. Общие модели
-берутся из пакета [my-foodapp-models](https://github.com/Nikolaiko/my-foodapp-models)
-(продукт `Model`). Деплой через **Docker Compose** на VPS.
+Стек: **Swift 6.2**, **Vapor 4**, **Fluent** + **PostgreSQL**. Модели API
+(`FoodRecipe`, `FoodProduct`, …) — отдельный таргет `Model` в этом же пакете.
+Деплой через **Docker Compose** на VPS.
 
 ## Быстрый старт
 
@@ -42,7 +42,7 @@ curl -H "Auth: <ключ>" http://127.0.0.1:8080/recipes
 ## Архитектура
 
 Классический Vapor-проект: контроллеры → сервисы → Fluent-модели БД.
-Наружу отдаются типы из пакета `Model` (`FoodRecipe`, `FoodProduct`), а в БД
+Наружу отдаются типы из таргета `Model` (`FoodRecipe`, `FoodProduct`), а в БД
 лежат собственные Fluent-модели (`DBRecipeEntry`, `DBRecipeProductEntry`).
 Маппинг между ними — в расширениях `+DBObject`.
 
@@ -53,7 +53,7 @@ routes.swift
  └─► ReceiptsController ─► QRDataParsingNetworkService ─► proverkacheka.com
                         └─► SimpleProductsParser  (название товара → FoodProductType)
 
-Все слои ──► Model (my-foodapp-models): FoodRecipe, FoodProduct, QRCodeRawData, …
+Все слои ──► Model (таргет Sources/Model): FoodRecipe, FoodProduct, QRCodeRawData, …
 ```
 
 | Папка / файл | Назначение |
@@ -107,7 +107,8 @@ routes.swift
 | `urlError` / `emptyResponse`, `ParsingError` | `500` |
 | `wrongStatusCode(n)` — proverkacheka ответил не-2xx | `n` |
 
-**Даты** в JSON — ISO 8601 (дефолтный энкодер Vapor).
+**Даты** в JSON — ISO 8601 (дефолтный энкодер Vapor). `FoodProduct.date` —
+день, время всегда начало дня по UTC: `2026-07-12T00:00:00Z`.
 
 ## Про данные чека
 
@@ -120,9 +121,9 @@ QR-код чека ФНС содержит **только фискальные �
 4. каждую позицию превращает в `FoodProduct` через `SimpleProductsParser`:
    тип определяется поиском ключевых слов в названии (яблоко, молоко, томаты,
    лук зелёный/красный…), иначе `.unknown`. Количество округляется вверх,
-   `quantityType` = `.unknown`, `date` = текущая дата, `id` — новый UUID.
+   `quantityType` = `.unknown`, `date` = текущий день (по UTC), `id` — новый UUID.
 
-Новый тип продукта = новый case в `FoodProductType` (пакет `Model`) + ключевые
+Новый тип продукта = новый case в `FoodProductType` (таргет `Model`) + ключевые
 слова в `SimpleProductsParser`.
 
 ## База данных
@@ -179,19 +180,29 @@ docker compose down               # остановить (данные БД со
 > (`#if canImport(FoundationNetworking)`), а в runtime-образе — `libcurl4`.
 > Если добавляете сетевой код, не забывайте про условный импорт.
 
-## Модели (my-foodapp-models)
+## Модели (таргет `Model`)
 
-Общие типы подключаются SPM-пакетом `my-foodapp-models` по semver-тегу
-(`.upToNextMajor(from: "1.0.5")`); точная версия зафиксирована в
-`Package.resolved` (закоммичен, Docker-сборка использует его как есть).
+Типы, которые ходят через API, лежат в отдельном таргете `Model`
+(`Sources/Model`), `App` его импортирует:
 
-Изменили модели → выпустили новый тег в `my-foodapp-models` → здесь:
+| Тип | Где используется |
+|---|---|
+| `FoodRecipe`, `FoodRecipeProductEntry` | тело запросов и ответов `/recipes` |
+| `FoodProduct` | ответ `POST /receipts/parse` |
+| `QRCodeRawData` | тело запроса `POST /receipts/parse` |
+| `FoodProductType`, `FoodQuantityType` | тип продукта и единица измерения, хранятся в БД |
 
-```bash
-swift package update my-foodapp-models
-```
+Раньше они подключались пакетом [my-foodapp-models](https://github.com/Nikolaiko/my-foodapp-models);
+перенесены из его версии 1.0.9 — только то, что использует бэкенд. Зависимости
+от пакета больше нет, модели меняются прямо здесь.
 
-и закоммитить обновлённый `Package.resolved`.
+- `FoodProduct.date` — день покупки: в `init` и при декодировании время
+  отбрасывается до начала дня по UTC.
+- Raw value `FoodProductType` (строки) и `FoodQuantityType` (числа 0, 1, 2… по
+  порядку case) лежат в Postgres: существующие не меняйте, новые case добавляйте
+  в конец.
+- Модели — часть контракта с клиентом: поменяли модель — обновите
+  [OpenAPI-спеку](#api).
 
 ## Тесты
 
@@ -199,7 +210,8 @@ swift package update my-foodapp-models
 swift test
 ```
 
-Тестам нужен отдельный PostgreSQL на порту **5433** с БД `products_test`
+Тестам моделей (`ModelTests`, swift-testing) база не нужна. Тестам `AppTests`
+нужен отдельный PostgreSQL на порту **5433** с БД `products_test`
 (`Application.testable()` перед каждым тестом делает `autoRevert` + `autoMigrate`):
 
 ```bash
