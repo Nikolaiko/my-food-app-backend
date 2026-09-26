@@ -13,9 +13,9 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent.git", from: "4.13.0"),
         .package(url: "https://github.com/vapor/fluent-mongo-driver.git", from: "1.4.0"),
         .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.12.0"),
-        .package(url: "https://github.com/Nikolaiko/my-foodapp-models.git", .upToNextMajor(from: "1.0.5")),
     ],
     targets: [
+        .target(name: "Model"),
         .executableTarget(
             name: "App",
             dependencies: [
@@ -23,11 +23,15 @@ let package = Package(
                 .product(name: "Fluent", package: "fluent"),
                 .product(name: "FluentMongoDriver", package: "fluent-mongo-driver"),
                 .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
-                .product(name: "Model", package: "my-foodapp-models"),
+                .target(name: "Model"),
             ]
         ),
+        .testTarget(name: "ModelTests", dependencies: [
+            .target(name: "Model"),
+        ]),
         .testTarget(name: "AppTests", dependencies: [
             .target(name: "App"),
+            .target(name: "Model"),
             .product(name: "XCTVapor", package: "vapor"),
 
             // Workaround for https://github.com/apple/swift-package-manager/issues/6940

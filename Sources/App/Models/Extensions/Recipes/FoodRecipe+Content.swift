@@ -2,7 +2,7 @@ import Foundation
 import Model
 import Vapor
 
-extension FoodRecipe: Content, @unchecked Sendable {
+extension FoodRecipe: Content {
     enum CodingKeys: String, CodingKey {
         case id
         case name
