@@ -8,4 +8,5 @@
 
 struct JSONInformation: Codable {
     let items: [ProductItem]
+    let dateTime: String?
 }

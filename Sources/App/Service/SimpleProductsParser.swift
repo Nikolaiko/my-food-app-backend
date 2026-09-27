@@ -25,7 +25,7 @@ struct SimpleProductsParser {
     private let onionGreenName = ["зеленый"]
 
 
-    func parseProductItem(item: ProductItem) -> FoodProduct {
+    func parseProductItem(item: ProductItem, date: String) -> FoodProduct {
         var parsedType: FoodProductType = .unknown
         let itemName = item.name.lowercased()
 
@@ -63,7 +63,32 @@ struct SimpleProductsParser {
             quantity: Float(ceil(item.quantity)),
             quantityType: .unknown,
             type: parsedType,
-            date: Date()
+            date: date
         )
+    }
+
+    func purchaseDay(receiptDateTime: String?, qrRawString: String, now: Date = Date()) -> String {
+        let receiptDay = receiptDateTime.flatMap { parseDay($0.prefix(10), format: "yyyy-MM-dd") }
+        let qrDay = qrRawString
+            .split(separator: "&")
+            .first { $0.hasPrefix("t=") }
+            .flatMap { parseDay($0.dropFirst(2).prefix(8), format: "yyyyMMdd") }
+        return makeFormatter(format: "yyyy-MM-dd").string(from: receiptDay ?? qrDay ?? now)
+    }
+
+    private func parseDay(_ string: Substring, format: String) -> Date? {
+        let formatter = makeFormatter(format: format)
+        guard let date = formatter.date(from: String(string)), formatter.string(from: date) == string else {
+            return nil
+        }
+        return date
+    }
+
+    private func makeFormatter(format: String) -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = format
+        return formatter
     }
 }

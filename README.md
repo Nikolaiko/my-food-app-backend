@@ -51,7 +51,7 @@ routes.swift
  ├─► RecipeController ───► DataProvider ─────────────► Fluent (PostgreSQL)
  │                                                     DBRecipeEntry / DBRecipeProductEntry
  └─► ReceiptsController ─► QRDataParsingNetworkService ─► proverkacheka.com
-                        └─► SimpleProductsParser  (название товара → FoodProductType)
+                        └─► SimpleProductsParser  (название товара → FoodProductType, день покупки)
 
 Все слои ──► Model (таргет Sources/Model): FoodRecipe, FoodProduct, QRCodeRawData, …
 ```
@@ -64,10 +64,10 @@ routes.swift
 | `Controllers/` | `RecipeController` (`/recipes`), `ReceiptsController` (`/receipts`) |
 | `Service/DataProvider` | Работа с рецептами в БД: выборка, добавление и обновление в транзакциях |
 | `Service/QRDataParsingNetworkService` | Запрос к API proverkacheka.com по сырой строке QR |
-| `Service/SimpleProductsParser` | Определение `FoodProductType` по названию товара (поиск ключевых слов) |
+| `Service/SimpleProductsParser` | Определение `FoodProductType` по названию товара (поиск ключевых слов) и дня покупки |
 | `Migrations/` | Схема БД, начальные данные, смена типа `count` на `Float` |
 | `Models/Database/` | Fluent-модели таблиц |
-| `Models/Receipts/` | DTO ответа proverkacheka (`ReceiptData` → `json.items[]`) |
+| `Models/Receipts/` | DTO ответа proverkacheka (`ReceiptData` → `json.items[]`, `json.dateTime`) |
 | `Models/Extensions/` | `Content` для типов из `Model`, маппинг в DB-объекты и обратно |
 | `Models/Errors/` | `CommonRequestError` → HTTP-статусы |
 | `Consts/` | Имена и порты БД, имя и значение заголовка авторизации |
@@ -107,8 +107,9 @@ routes.swift
 | `urlError` / `emptyResponse` | `500` |
 | `wrongStatusCode(n)` — proverkacheka ответил не-2xx | `n` |
 
-**Даты** в JSON — ISO 8601 (дефолтный энкодер Vapor). `FoodProduct.date` —
-день, время всегда начало дня по UTC: `2026-07-12T00:00:00Z`.
+**Дата продукта** `FoodProduct.date` — день покупки строкой `YYYY-MM-DD`
+(`"2026-07-12"`), как `format: date` в спеке. Откуда берётся день — в
+[Про данные чека](#про-данные-чека).
 
 ## Про данные чека
 
@@ -116,12 +117,18 @@ QR-код чека ФНС содержит **только фискальные �
 не список товаров. Поэтому `/receipts/parse`:
 
 1. принимает сырую строку QR (`QRCodeRawData.qrRawString`);
-2. отправляет её в `https://proverkacheka.com/api/v1/check/get` (form-urlencoded, `token` + `qrraw`);
-3. из ответа берёт `data.json.items[]`;
-4. каждую позицию превращает в `FoodProduct` через `SimpleProductsParser`:
+2. отправляет её как есть, в том числе без `t`, в
+   `https://proverkacheka.com/api/v1/check/get` (form-urlencoded, `token` + `qrraw`);
+3. из ответа берёт `data.json.items[]` и `data.json.dateTime`;
+4. определяет день покупки (`SimpleProductsParser.purchaseDay`) по первому
+   подходящему источнику: `data.json.dateTime` (`2024-01-17T11:26:00` →
+   `2024-01-17`), иначе параметр `t` из QR (`t=20240117T1126` → `2024-01-17`),
+   иначе сегодняшний день по UTC. Берётся только дата, как на чеке (время
+   кассы), без пересчёта часовых поясов;
+5. каждую позицию превращает в `FoodProduct` через `SimpleProductsParser`:
    тип определяется поиском ключевых слов в названии (яблоко, молоко, томаты,
    лук зелёный/красный…), иначе `.unknown`. Количество округляется вверх,
-   `quantityType` = `.unknown`, `date` = текущий день (по UTC), `id` — новый UUID.
+   `quantityType` = `.unknown`, `date` = день покупки из п. 4, `id` — новый UUID.
 
 Новый тип продукта = новый case в `FoodProductType` (таргет `Model`) + ключевые
 слова в `SimpleProductsParser`.
@@ -209,8 +216,8 @@ gh workflow run deploy.yml -f tag=1.0.0    # передеплой / откат �
 перенесены из его версии 1.0.9 — только то, что использует бэкенд. Зависимости
 от пакета больше нет, модели меняются прямо здесь.
 
-- `FoodProduct.date` — день покупки: в `init` и при декодировании время
-  отбрасывается до начала дня по UTC.
+- `FoodProduct.date` — день покупки строкой `YYYY-MM-DD`, как `format: date`
+  в спеке.
 - Raw value `FoodProductType` (строки) и `FoodQuantityType` (числа 0, 1, 2… по
   порядку case) лежат в Postgres: существующие не меняйте, новые case добавляйте
   в конец.
@@ -223,9 +230,10 @@ gh workflow run deploy.yml -f tag=1.0.0    # передеплой / откат �
 swift test
 ```
 
-Тестам моделей (`ModelTests`, swift-testing) база не нужна. Тестам `AppTests`
-нужен отдельный PostgreSQL на порту **5433** с БД `products_test`
-(`Application.testable()` перед каждым тестом делает `autoRevert` + `autoMigrate`):
+Тестам моделей (`ModelTests`) и разбора чека (`AppTests/Receipts`) база не
+нужна, они на swift-testing. Тестам, которые поднимают приложение через
+`Application.testable()`, нужен отдельный PostgreSQL на порту **5433** с БД
+`products_test` (перед каждым тестом делается `autoRevert` + `autoMigrate`):
 
 ```bash
 docker run -d --name food-db-test -p 5433:5432 \

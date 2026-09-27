@@ -6,8 +6,7 @@ public struct FoodProduct: Equatable, Hashable, Codable, Sendable {
     public let quantity: Float
     public let quantityType: FoodQuantityType
     public let type: FoodProductType
-    /// День покупки — начало дня по UTC: время отбрасывается в `init` и при декодировании.
-    public let date: Date
+    public let date: String
 
     public init(
         id: String,
@@ -15,26 +14,14 @@ public struct FoodProduct: Equatable, Hashable, Codable, Sendable {
         quantity: Float,
         quantityType: FoodQuantityType,
         type: FoodProductType,
-        date: Date
+        date: String
     ) {
         self.id = id
         self.name = name
         self.quantity = quantity
         self.quantityType = quantityType
         self.type = type
-        self.date = date.startOfDayUTC
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        try self.init(
-            id: container.decode(String.self, forKey: .id),
-            name: container.decode(String.self, forKey: .name),
-            quantity: container.decode(Float.self, forKey: .quantity),
-            quantityType: container.decode(FoodQuantityType.self, forKey: .quantityType),
-            type: container.decode(FoodProductType.self, forKey: .type),
-            date: container.decode(Date.self, forKey: .date)
-        )
+        self.date = date
     }
 
     public func copy(
@@ -43,7 +30,7 @@ public struct FoodProduct: Equatable, Hashable, Codable, Sendable {
         quantity: Float? = nil,
         quantityType: FoodQuantityType? = nil,
         type: FoodProductType? = nil,
-        date: Date? = nil
+        date: String? = nil
     ) -> FoodProduct {
         FoodProduct(
             id: id ?? self.id,
