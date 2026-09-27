@@ -21,8 +21,12 @@ class ReceiptsController: RouteCollection {
         }
 
         let productItems = try await networkService.sendQRCode(qrRawData: parsedQRData.qrRawString)
+        let purchaseDay = parser.purchaseDay(
+            receiptDateTime: productItems.data.dataJSON.dateTime,
+            qrRawString: parsedQRData.qrRawString
+        )
         return productItems.data.dataJSON.items.map { item in
-            parser.parseProductItem(item: item)
+            parser.parseProductItem(item: item, date: purchaseDay)
         }
     }
 }
