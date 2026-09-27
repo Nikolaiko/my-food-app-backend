@@ -29,6 +29,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(ChangeQuantityToFloat())
     app.migrations.add(AddRecipeTags())
     app.migrations.add(MoveCountToQuantities())
+    app.migrations.add(MakeRecipeColumnsNotNull())
 
     try await app.autoMigrate()
 
