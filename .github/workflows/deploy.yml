@@ -36,3 +36,4 @@ jobs:
             git checkout --detach "refs/tags/$TAG"
             docker compose up -d --build
             docker image prune -f
+            docker builder prune -af

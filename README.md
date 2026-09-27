@@ -173,7 +173,10 @@ docker compose down               # остановить (данные БД со
 **Деплой по релизу.** Push в `main` прод не трогает. Выкатывает публикация
 GitHub Release: `.github/workflows/deploy.yml` по SSH переключает репозиторий на
 VPS на тег релиза (`git fetch --tags` → `git checkout --detach <тег>`) и выполняет
-`docker compose up -d --build` → `docker image prune -f`. Ручной запуск
+`docker compose up -d --build` → `docker image prune -f` → `docker builder prune -af`.
+Build cache чистится целиком: `COPY . .` всё равно инвалидирует `swift build` при
+любом изменении, а диск на VPS маленький (2026-09-27 деплой упал с
+`no space left on device`). Ручной запуск
 workflow принимает тег — так передеплоить релиз или откатиться на старый:
 
 ```bash
