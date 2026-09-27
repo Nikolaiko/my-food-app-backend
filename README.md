@@ -150,6 +150,7 @@ PostgreSQL, схема создаётся миграциями (порядок �
 | `ChangeQuantityToFloat` | Меняет тип `recipe-product-entry.count` с `int64` на `float` |
 | `AddRecipeTags` | Добавляет в `recipe` колонку `tags` (`bigint[]`, по умолчанию пустой массив) |
 | `MoveCountToQuantities` | Заменяет `count` и `quantityMeasure` в `recipe-product-entry` колонкой `quantities` (`jsonb[]`): старая пара становится единственным элементом массива |
+| `MakeRecipeColumnsNotNull` | Запрещает NULL в `name`, `description`, `shortDescription` таблицы `recipe` и в `recipe-product-entry.productType`; найденные NULL заменяет на пустую строку и `Unknown` |
 
 `productType` хранится строкой (raw value `FoodProductType`), `quantities` —
 массивом JSON-объектов `{"count": …, "quantityMeasure": …}` (`quantityMeasure` —
