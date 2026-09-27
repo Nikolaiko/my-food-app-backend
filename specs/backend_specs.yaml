@@ -2,11 +2,11 @@ openapi: 3.0.0
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/NIKOLAIKO_1/ProductsAndRecipes/1.0.2
+    url: https://virtserver.swaggerhub.com/NIKOLAIKO_1/ProductsAndRecipes/1.0.3
   - description: LiveServer
     url: http://e97b67a8bc6.vps.myjino.ru:49158
 info:
-  version: 1.0.2
+  version: 1.0.3
   title: recipes-products-app
   description: API for adding and getting recipes
 paths:
@@ -334,16 +334,27 @@ components:
       required:
         - id
         - productType
-        - count
-        - quantityMeasure
+        - quantities
       properties:
         id:
           type: string
           example: "59E038B3-629B-4749-88EB-F09234D87BBB"
         productType:
           $ref: '#/components/schemas/FoodProductType'
+        quantities:
+          type: array
+          description: the same amount in different units, e.g. 4 items or 500 g
+          items:
+            $ref: '#/components/schemas/FoodRecipeQuantity'
+    FoodRecipeQuantity:
+      type: object
+      required:
+        - count
+        - quantityMeasure
+      properties:
         count:
           type: number
+          example: 500
         quantityMeasure:
           $ref: '#/components/schemas/FoodQuantityType'
     FoodProductType:

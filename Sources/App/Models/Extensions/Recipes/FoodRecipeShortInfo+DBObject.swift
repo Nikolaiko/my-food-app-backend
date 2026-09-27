@@ -6,7 +6,7 @@ extension FoodRecipeShortInfo {
             id: dbObject.id?.uuidString ?? "",
             name: dbObject.name,
             shortDescription: dbObject.shortDescription,
-            tags: []
+            tags: dbObject.tags
         )
     }
 }

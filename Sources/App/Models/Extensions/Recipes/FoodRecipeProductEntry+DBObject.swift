@@ -6,32 +6,28 @@ extension FoodRecipeProductEntry {
         FoodRecipeProductEntry(
             id: dbObject.id?.uuidString ?? "",
             productType: dbObject.productType,
-            count: dbObject.count,
-            quantityMeasure: FoodQuantityType(rawValue: dbObject.quantityMeasure) ?? .unknown
+            quantities: dbObject.quantities
         )
     }
 
     func toDBObject(parentRecipe: DBRecipeEntry) -> DBRecipeProductEntry {
         DBRecipeProductEntry(
             id: self.id.isEmpty ? nil : UUID(uuidString: self.id),
-            count: self.count,
             productType: self.productType,
-            quantityMeasure: self.quantityMeasure.rawValue,
+            quantities: self.quantities,
             recipe: parentRecipe.id!
         )
     }
 
     func copy(
         newId: String? = nil,
-        newCount: Float? = nil,
         newProductType: FoodProductType? = nil,
-        newQuantityMeasureType: FoodQuantityType? = nil
+        newQuantities: [FoodRecipeQuantity]? = nil
     ) -> FoodRecipeProductEntry {
         FoodRecipeProductEntry(
             id: newId ?? id,
             productType: newProductType ?? productType,
-            count: newCount ?? count,
-            quantityMeasure: newQuantityMeasureType ?? quantityMeasure
+            quantities: newQuantities ?? quantities
         )
     }
 }

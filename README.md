@@ -65,7 +65,7 @@ routes.swift
 | `Service/DataProvider` | Работа с рецептами в БД: выборка, добавление и обновление в транзакциях |
 | `Service/QRDataParsingNetworkService` | Запрос к API proverkacheka.com по сырой строке QR |
 | `Service/SimpleProductsParser` | Определение `FoodProductType` по названию товара (поиск ключевых слов) и дня покупки |
-| `Migrations/` | Схема БД, начальные данные, смена типа `count` на `Float` |
+| `Migrations/` | Схема БД, начальные данные и последующие изменения схемы |
 | `Models/Database/` | Fluent-модели таблиц |
 | `Models/Receipts/` | DTO ответа proverkacheka (`ReceiptData` → `json.items[]`, `json.dateTime`) |
 | `Models/Extensions/` | `Content` для типов из `Model`, маппинг в DB-объекты и обратно |
@@ -109,6 +109,10 @@ routes.swift
 | `urlError` / `emptyResponse` | `500` |
 | `wrongStatusCode(n)` — proverkacheka ответил не-2xx | `n` |
 
+**Количество продукта в рецепте** `FoodRecipeProductEntry.quantities` — массив
+`{ "count": 500, "quantityMeasure": 1 }`: одно и то же количество в разных
+единицах (например, 4 шт или 500 г). Массив может быть пустым.
+
 **Дата продукта** `FoodProduct.date` — день покупки строкой `YYYY-MM-DD`
 (`"2026-07-12"`), как `format: date` в спеке. Откуда берётся день — в
 [Про данные чека](#про-данные-чека).
@@ -144,10 +148,17 @@ PostgreSQL, схема создаётся миграциями (порядок �
 | `CreateDBSchema` | Таблицы `recipe` (name, description, shortDescription) и `recipe-product-entry` (count, quantityMeasure, productType, `recipe_id` → `recipe.id` с `ON DELETE CASCADE`) |
 | `AddInitialRecipes` | Добавляет стартовый рецепт «Овощной салат» с тремя продуктами |
 | `ChangeQuantityToFloat` | Меняет тип `recipe-product-entry.count` с `int64` на `float` |
+| `AddRecipeTags` | Добавляет в `recipe` колонку `tags` (`bigint[]`, по умолчанию пустой массив) |
+| `MoveCountToQuantities` | Заменяет `count` и `quantityMeasure` в `recipe-product-entry` колонкой `quantities` (`jsonb[]`): старая пара становится единственным элементом массива |
 
-`productType` хранится строкой (raw value `FoodProductType`), `quantityMeasure` —
-числом (raw value `FoodQuantityType`). Новую миграцию добавляйте **в конец**
-списка в `configure.swift`, существующие не редактируйте.
+`productType` хранится строкой (raw value `FoodProductType`), `quantities` —
+массивом JSON-объектов `{"count": …, "quantityMeasure": …}` (`quantityMeasure` —
+raw value `FoodQuantityType`), `tags` — массивом чисел. Новую миграцию добавляйте
+**в конец** списка в `configure.swift`, существующие не редактируйте.
+
+DB-классы в миграциях не используйте: они меняются вместе с моделями, и старая
+миграция на чистой БД писала бы в колонки, которых на её шаге ещё нет. Поэтому
+`AddInitialRecipes` вставляет стартовый рецепт по именам колонок через SQLKit.
 
 ## Конфигурация
 
@@ -209,7 +220,7 @@ gh workflow run deploy.yml -f tag=1.0.0    # передеплой / откат �
 
 | Тип | Где используется |
 |---|---|
-| `FoodRecipe`, `FoodRecipeProductEntry` | тело запросов и ответов `/recipes` |
+| `FoodRecipe`, `FoodRecipeProductEntry`, `FoodRecipeQuantity` | тело запросов и ответов `/recipes` |
 | `FoodProduct` | ответ `POST /receipts/parse` |
 | `QRCodeRawData` | тело запроса `POST /receipts/parse` |
 | `FoodProductType`, `FoodQuantityType` | тип продукта и единица измерения, хранятся в БД |
@@ -244,7 +255,7 @@ docker run -d --name food-db-test -p 5433:5432 \
 ```
 
 > Сейчас все тесты рецептов (`Tests/AppTests/Recipes`) закомментированы — их
-> нужно актуализировать под async-API Vapor и `Float`-количество.
+> нужно актуализировать под async-API Vapor и `quantities` у продуктов.
 
 ## Планы и известные ограничения
 
@@ -253,5 +264,4 @@ docker run -d --name food-db-test -p 5433:5432 \
 - Заменить общий ключ на пользовательскую аутентификацию (сейчас `login`/`register`
   в клиенте — мок).
 - Вернуть тесты и добавить CI на прогон `swift test`.
-- `tags` у рецептов пока не хранятся в БД — всегда отдаются пустым массивом.
 - Зависимость `fluent-mongo-driver` подключена, но не используется.
