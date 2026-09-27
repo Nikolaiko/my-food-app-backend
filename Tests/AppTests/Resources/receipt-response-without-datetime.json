@@ -1,0 +1,18 @@
+{
+    "data": {
+        "json": {
+            "items": [
+                {
+                    "nds": 1,
+                    "sum": 700,
+                    "name": "ПАКЕТ УПАКОВОЧНЫЙ",
+                    "price": 700,
+                    "quantity": 1,
+                    "paymentType": 4,
+                    "productType": 1,
+                    "itemsQuantityMeasure": 0
+                }
+            ]
+        }
+    }
+}

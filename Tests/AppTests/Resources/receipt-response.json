@@ -1,0 +1,32 @@
+{
+    "code": 1,
+    "data": {
+        "json": {
+            "items": [
+                {
+                    "nds": 2,
+                    "sum": 14784,
+                    "name": "ТОМАТЫ СВЕЖИЕ КРАСНЫЕ 1КГ РОССИЯ",
+                    "price": 38500,
+                    "quantity": 0.384,
+                    "paymentType": 4,
+                    "productType": 1,
+                    "itemsQuantityMeasure": 11
+                },
+                {
+                    "nds": 2,
+                    "sum": 10200,
+                    "name": "СМЕТАНА ПРОСТОКВАШИНО 15% 300Г ПЛ/УП",
+                    "price": 10200,
+                    "quantity": 1,
+                    "paymentType": 4,
+                    "productType": 33,
+                    "labelCodeProcesMode": 0,
+                    "itemsQuantityMeasure": 0,
+                    "checkingProdInformationResult": 0
+                }
+            ],
+            "dateTime": "2024-01-17T11:26:00"
+        }
+    }
+}
