@@ -1,0 +1,402 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/NIKOLAIKO_1/ProductsAndRecipes/1.0.2
+  - description: LiveServer
+    url: http://e97b67a8bc6.vps.myjino.ru:49158
+info:
+  version: 1.0.2
+  title: recipes-products-app
+  description: API for adding and getting recipes
+paths:
+  /recipes:
+    get:
+      tags:
+        - recipes
+      summary: get all recipes short info
+      description: get all recipes avialable in db
+      parameters:
+        - in: header
+          name: auth
+          schema:
+            type: string
+            format: uuid
+            example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+          required: true
+      responses:
+        '200':
+          description: recipes returned to client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodRecipesShortInfoList'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+    put:
+      tags:
+        - recipes
+      summary: modify recipe by id and body
+      description: update current recipe full info
+      parameters:
+        - in: header
+          name: auth
+          schema:
+            type: string
+            format: uuid
+            example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+          required: true
+      requestBody:
+        description: updated recipe values
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FoodRecipe'
+      responses:
+        '200':
+          description: updated recipe data returned to client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodRecipe'
+        '400':
+          description: BadRequest, wrong or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+  
+  /recipes/{recipe_id}:
+    get:
+      tags:
+        - recipes
+      summary: get recipe by id
+      description: get current recipe full info
+      parameters:
+        - in: header
+          name: auth
+          schema:
+            type: string
+            format: uuid
+            example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+          required: true
+        - in: path
+          name: recipe_id
+          schema:
+            type: string
+          required: true
+          example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+          description: String uuid of the recipe to get
+      responses:
+        '200':
+          description: recipe data returned to client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodRecipe'
+        '400':
+          description: BadRequest, wrong or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+    
+  /recipes/add:
+    post:
+      tags:
+        - recipes
+      summary: create new recipe
+      description: create new recipe using full info
+      parameters:
+        - in: header
+          name: auth
+          schema:
+            type: string
+            format: uuid
+            example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+          required: true
+      requestBody:
+        description: new recipe values
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FoodRecipe'
+      responses:
+        '200':
+          description: newly recipe data returned to client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodRecipe'
+        '400':
+          description: bad request, wrong/missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'  
+  /receipts/parse:
+    post:
+      tags:
+        - receipts
+      summary: parse receipt data
+      description: parse receipt data
+      parameters:
+        - in: header
+          name: auth
+          schema:
+            type: string
+            format: uuid
+            example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+          required: true
+      requestBody:
+        description: receipt data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QRCodeRawData'
+      responses:
+        '200':
+          description: parsed receipt data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodProductsList'
+        '400':
+          description: bad request, wrong/missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonErrorResponse'
+
+components:
+  schemas:
+    FoodRecipesShortInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FoodRecipeShortInfo'
+    FoodRecipeShortInfo:
+      type: object
+      required: 
+        - id
+        - name
+        - shortDescription
+        - tags
+      properties:
+        id:
+          type: string
+          example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+        name: 
+          type: string
+          example: Овощной Салат
+        shortDescription:
+          type: string
+          example: "Овощной Салат"
+        tags:
+          type: array
+          items:
+            type: integer
+    FoodRecipe:
+        type: object
+        required: 
+          - id
+          - name
+          - shortDescription
+          - description
+          - tags
+          - products
+        properties:
+          id:
+            type: string
+            example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+          name: 
+            type: string
+            example: Овощной Салат
+          shortDescription:
+            type: string
+            example: "Овощной Салат"
+          description:
+            type: string
+            example: "Овощной Салат"
+          tags:
+            type: array
+            items:
+              type: integer
+          products:
+            type: array
+            items:
+              $ref: '#/components/schemas/FoodRecipeProductEntry'
+    FoodProductsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FoodProduct'
+    FoodProduct:
+        type: object
+        required: 
+          - id
+          - name
+          - quantity
+          - quantityType
+          - type
+          - date
+        properties:
+          id:
+            type: string
+            example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+          name: 
+            type: string
+            example: ТОМАТЫ СВЕЖИЕ КРАСНЫЕ 1КГ РОССИЯ
+          quantity:
+            type: number
+            example: 10
+          quantityType:
+            $ref: '#/components/schemas/FoodQuantityType'
+          type:
+            $ref: '#/components/schemas/FoodProductType'
+          date:
+            type: string
+            format: date
+            example: "2017-07-21"
+    FoodRecipeProductEntry:
+      type: object
+      required:
+        - id
+        - productType
+        - count
+        - quantityMeasure
+      properties:
+        id:
+          type: string
+          example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+        productType:
+          $ref: '#/components/schemas/FoodProductType'
+        count:
+          type: number
+        quantityMeasure:
+          $ref: '#/components/schemas/FoodQuantityType'
+    FoodProductType:
+      type: string
+      enum:
+        - Unknown
+        - Apple
+        - Orange
+        - Tomato
+        - Milk
+        - Cottage
+        - Cucumber
+        - Potato
+        - BellPepper
+        - GreenOnion
+        - RedOnion
+        - Onions
+        - Sourcream
+        - Buckwheat
+    FoodQuantityType:
+      type: integer
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+      description: |
+        0- unknown
+        1- weight
+        2- packed
+        3- item
+        4- liquid
+    QRCodeRawData:
+      type: object
+      required:
+        - qrRawString
+      properties:
+        qrRawString:
+          type: string
+          example: "t=20240115T1830&s=549.00&fn=9999078902005430&i=12345&fp=1234567890&n=1"
+    CommonErrorResponse:
+      type: object
+      required:
+        - reason
+        - errorType
+      properties:
+        reason:
+          type: string
+          example: Error message
+        errorType:
+          $ref: '#/components/schemas/CommonErrorType'
+    CommonErrorType:
+      type: string
+      enum:
+        - unknown

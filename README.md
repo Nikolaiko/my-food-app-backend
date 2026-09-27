@@ -74,10 +74,12 @@ routes.swift
 
 ## API
 
-Контракт описан OpenAPI-спекой в репозитории клиента:
-[`specs/backend_specs.yaml`](https://github.com/Nikolaiko/my-food-app-ai-project/blob/main/specs/backend_specs.yaml).
-Из неё генерируется сетевой клиент iOS-приложения, поэтому **при любом
-изменении API обновляйте спеку** и перегенерируйте клиент.
+Контракт описан OpenAPI-спекой в этом репозитории:
+[`specs/backend_specs.yaml`](specs/backend_specs.yaml). Из неё генерируется
+сетевой клиент iOS-приложения: скрипт `scripts/generate-backend-service.sh`
+[клиента](https://github.com/Nikolaiko/my-food-app-ai-project) берёт спеку из
+соседней папки `../my-food-app-backend`. Поэтому **при любом изменении API
+обновляйте спеку** и перегенерируйте клиент.
 
 | Метод | Путь | Тело запроса | Ответ | Авторизация |
 |---|---|---|---|---|
