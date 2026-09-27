@@ -27,6 +27,8 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateDBSchema())
     app.migrations.add(AddInitialRecipes())
     app.migrations.add(ChangeQuantityToFloat())
+    app.migrations.add(AddRecipeTags())
+    app.migrations.add(MoveCountToQuantities())
 
     try await app.autoMigrate()
 

@@ -1,39 +1,48 @@
 import Foundation
 import Fluent
+import FluentSQL
 import Model
 
 struct AddInitialRecipes: AsyncMigration {
     func prepare(on database: FluentKit.Database) async throws {
         try await database.transaction { currentDatabase in
-            let vegtableSalad = DBRecipeEntry(
-                name: InitialDBData.recipeOneName,
-                description: InitialDBData.recipeOneDescription,
-                shortDescription: InitialDBData.recipeOneShortDescription
-            )
-            try await vegtableSalad.save(on: currentDatabase)
+            let sql = currentDatabase as! any SQLDatabase
+            let vegtableSaladId = UUID()
 
+            try await sql.insert(into: DBRecipeEntry.schema)
+                .columns("id", "name", "description", "shortDescription")
+                .values(
+                    vegtableSaladId,
+                    InitialDBData.recipeOneName,
+                    InitialDBData.recipeOneDescription,
+                    InitialDBData.recipeOneShortDescription
+                )
+                .run()
 
-            let tomatoForSalad = DBRecipeProductEntry(
-                count: InitialDBData.initialTomatoCount,
-                productType: .tomato,
-                quantityMeasure: InitialDBData.initialTomatoQuantityType.rawValue,
-                recipe: vegtableSalad.id!)
-
-            let cucumberForSalad = DBRecipeProductEntry(
-                count: InitialDBData.initialCucmberCount,
-                productType: .cucumber,
-                quantityMeasure: InitialDBData.initialCucmberQuantityType.rawValue,
-                recipe: vegtableSalad.id!)
-
-            let sourCreamForSalad = DBRecipeProductEntry(
-                count: InitialDBData.initialCreamCount,
-                productType: .sourcream,
-                quantityMeasure: InitialDBData.initialCreamQuantityType.rawValue,
-                recipe: vegtableSalad.id!)
-
-            try await tomatoForSalad.save(on: currentDatabase)
-            try await cucumberForSalad.save(on: currentDatabase)
-            try await sourCreamForSalad.save(on: currentDatabase)
+            try await sql.insert(into: DBRecipeProductEntry.schema)
+                .columns("id", "count", "productType", "quantityMeasure", "recipe_id")
+                .values(
+                    UUID(),
+                    InitialDBData.initialTomatoCount,
+                    FoodProductType.tomato.rawValue,
+                    InitialDBData.initialTomatoQuantityType.rawValue,
+                    vegtableSaladId
+                )
+                .values(
+                    UUID(),
+                    InitialDBData.initialCucmberCount,
+                    FoodProductType.cucumber.rawValue,
+                    InitialDBData.initialCucmberQuantityType.rawValue,
+                    vegtableSaladId
+                )
+                .values(
+                    UUID(),
+                    InitialDBData.initialCreamCount,
+                    FoodProductType.sourcream.rawValue,
+                    InitialDBData.initialCreamQuantityType.rawValue,
+                    vegtableSaladId
+                )
+                .run()
         }
     }
 

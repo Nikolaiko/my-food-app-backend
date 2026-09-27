@@ -9,7 +9,7 @@ extension FoodRecipe {
             shortDescription: dbObject.shortDescription,
             description: dbObject.description,
             products: dbObject.products.map { FoodRecipeProductEntry.fromDBObject(dbObject: $0) },
-            tags: []
+            tags: dbObject.tags
         )
     }
 
@@ -17,8 +17,9 @@ extension FoodRecipe {
         DBRecipeEntry(
             id: self.id.isEmpty ? nil : UUID(uuidString: self.id),
             name: self.name,
+            shortDescription: self.shortDescription,
             description: self.description,
-            shortDescription: self.shortDescription
+            tags: self.tags
         )
     }
 

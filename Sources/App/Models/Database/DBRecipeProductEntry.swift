@@ -8,14 +8,11 @@ final class DBRecipeProductEntry: Model,  @unchecked Sendable {
     @ID(key: .id)
     var id: UUID?
 
-    @Field(key: "count")
-    var count: Float
-
     @Enum(key: "productType")
     var productType: FoodProductType
 
-    @Field(key: "quantityMeasure")
-    var quantityMeasure: Int
+    @Field(key: "quantities")
+    var quantities: [FoodRecipeQuantity]
 
     @Parent(key: "recipe_id")
     var recipe: DBRecipeEntry
@@ -23,15 +20,13 @@ final class DBRecipeProductEntry: Model,  @unchecked Sendable {
     init() { }
 
     init(id: UUID? = nil,
-         count: Float,
          productType: FoodProductType,
-         quantityMeasure: Int,
+         quantities: [FoodRecipeQuantity],
          recipe: DBRecipeEntry.IDValue
     ) {
         self.id = id
-        self.count = count
         self.productType = productType
-        self.quantityMeasure = quantityMeasure
+        self.quantities = quantities
         self.$recipe.id = recipe
     }
 }

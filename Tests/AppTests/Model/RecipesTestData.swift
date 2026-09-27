@@ -5,8 +5,7 @@ enum RecipesTestData {
     static let testProductItem = FoodRecipeProductEntry(
         id: "",
         productType: FoodProductType.apple,
-        count: 2,
-        quantityMeasure: FoodQuantityType.item
+        quantities: [FoodRecipeQuantity(count: 2, quantityMeasure: FoodQuantityType.item)]
     )
 
     static let testRecipe = FoodRecipe(
@@ -27,15 +26,13 @@ enum RecipesTestData {
     static let newFirstProductItem = FoodRecipeProductEntry(
         id: "",
         productType: FoodProductType.cottage,
-        count: 4,
-        quantityMeasure: FoodQuantityType.item
+        quantities: [FoodRecipeQuantity(count: 4, quantityMeasure: FoodQuantityType.item)]
     )
 
     static let newSecondProductItem = FoodRecipeProductEntry(
         id: "",
         productType: FoodProductType.bellpepper,
-        count: 4,
-        quantityMeasure: FoodQuantityType.weight
+        quantities: [FoodRecipeQuantity(count: 4, quantityMeasure: FoodQuantityType.weight)]
     )
 
     static let testDummyEntity = DummyTestEntity(name: "some", id: "123")

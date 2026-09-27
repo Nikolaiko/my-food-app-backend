@@ -10,25 +10,30 @@ final class DBRecipeEntry: Model,  @unchecked Sendable {
     @Field(key: "name")
     var name: String
 
-    @Field(key: "description")
-    var description: String
-
     @Field(key: "shortDescription")
     var shortDescription: String
 
+    @Field(key: "description")
+    var description: String
+
     @Children(for: \.$recipe)
     var products: [DBRecipeProductEntry]
+
+    @Field(key: "tags")
+    var tags: [Int]
 
     init() { }
 
     init(id: UUID? = nil,
          name: String,
+         shortDescription: String,
          description: String,
-         shortDescription: String
+         tags: [Int]
     ) {
         self.id = id
         self.name = name
-        self.description = description
         self.shortDescription = shortDescription
+        self.description = description
+        self.tags = tags
     }
 }

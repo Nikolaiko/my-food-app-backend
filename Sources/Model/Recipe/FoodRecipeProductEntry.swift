@@ -3,17 +3,14 @@ import Foundation
 public struct FoodRecipeProductEntry: Codable, Sendable {
     public let id: String
     public let productType: FoodProductType
-    public let count: Float
-    public let quantityMeasure: FoodQuantityType
+    public let quantities: [FoodRecipeQuantity]
 
     public init(id: String,
                 productType: FoodProductType,
-                count: Float,
-                quantityMeasure: FoodQuantityType
+                quantities: [FoodRecipeQuantity]
     ) {
         self.id = id
         self.productType = productType
-        self.count = count
-        self.quantityMeasure = quantityMeasure
+        self.quantities = quantities
     }
 }
