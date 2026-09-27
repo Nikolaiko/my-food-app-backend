@@ -170,9 +170,22 @@ docker compose logs -f app        # логи
 docker compose down               # остановить (данные БД сохраняются)
 ```
 
-**Авто-деплой.** Push в `main` (или ручной запуск) запускает
-`.github/workflows/deploy.yml`: по SSH на VPS выполняется
-`git pull --ff-only` → `docker compose up -d --build` → `docker image prune -f`.
+**Деплой по релизу.** Push в `main` прод не трогает. Выкатывает публикация
+GitHub Release: `.github/workflows/deploy.yml` по SSH переключает репозиторий на
+VPS на тег релиза (`git fetch --tags` → `git checkout --detach <тег>`) и выполняет
+`docker compose up -d --build` → `docker image prune -f` → `docker builder prune -af`.
+Build cache чистится целиком: `COPY . .` всё равно инвалидирует `swift build` при
+любом изменении, а диск на VPS маленький (2026-09-27 деплой упал с
+`no space left on device`). Ручной запуск
+workflow принимает тег — так передеплоить релиз или откатиться на старый:
+
+```bash
+gh release create 1.0.0 --generate-notes   # тег на текущем main → деплой
+gh workflow run deploy.yml -f tag=1.0.0    # передеплой / откат на тег
+```
+
+Черновик релиза (`--draft`) деплой не запускает — только публикация. Репозиторий
+на сервере после деплоя стоит на теге (detached HEAD), `git pull` там не нужен.
 Нужные секреты репозитория: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_PORT`.
 Сборка образа на сервере долгая, поэтому таймаут шага — 30 минут.
 

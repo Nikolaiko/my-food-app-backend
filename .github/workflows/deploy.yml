@@ -1,9 +1,14 @@
 name: Deploy
 
 on:
-  push:
-    branches: [main]
+  release:
+    types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to deploy (redeploy or rollback)
+        required: true
+        type: string
 
 concurrency:
   group: deploy-production
@@ -15,15 +20,20 @@ jobs:
     steps:
       - name: Deploy to VPS over SSH
         uses: appleboy/ssh-action@v1
+        env:
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           command_timeout: 30m
+          envs: TAG
           script: |
             set -e
             cd /root/my_food_app_backend/my-food-app-backend
-            git pull --ff-only origin main
+            git fetch --force --tags origin
+            git checkout --detach "refs/tags/$TAG"
             docker compose up -d --build
             docker image prune -f
+            docker builder prune -af
