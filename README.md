@@ -68,8 +68,8 @@ routes.swift
 | `Migrations/` | Схема БД, начальные данные, смена типа `count` на `Float` |
 | `Models/Database/` | Fluent-модели таблиц |
 | `Models/Receipts/` | DTO ответа proverkacheka (`ReceiptData` → `json.items[]`) |
-| `Models/Extensions/` | `Content`/`Codable` для типов из `Model`, маппинг в DB-объекты и обратно |
-| `Models/Errors/` | `CommonRequestError`, `ParsingError` → HTTP-статусы |
+| `Models/Extensions/` | `Content` для типов из `Model`, маппинг в DB-объекты и обратно |
+| `Models/Errors/` | `CommonRequestError` → HTTP-статусы |
 | `Consts/` | Имена и порты БД, имя и значение заголовка авторизации |
 
 ## API
@@ -104,7 +104,7 @@ routes.swift
 | `notAuthotized` | `401` |
 | `notFound` | `404` |
 | `unableToGetParameter` / `unableToParseParameter` | `400` |
-| `urlError` / `emptyResponse`, `ParsingError` | `500` |
+| `urlError` / `emptyResponse` | `500` |
 | `wrongStatusCode(n)` — proverkacheka ответил не-2xx | `n` |
 
 **Даты** в JSON — ISO 8601 (дефолтный энкодер Vapor). `FoodProduct.date` —
