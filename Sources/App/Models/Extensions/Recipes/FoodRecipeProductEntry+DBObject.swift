@@ -12,7 +12,6 @@ extension FoodRecipeProductEntry {
 
     func toDBObject(parentRecipe: DBRecipeEntry) -> DBRecipeProductEntry {
         DBRecipeProductEntry(
-            id: self.id.isEmpty ? nil : UUID(uuidString: self.id),
             productType: self.productType,
             quantities: self.quantities,
             recipe: parentRecipe.id!
