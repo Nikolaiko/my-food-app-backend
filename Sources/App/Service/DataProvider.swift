@@ -48,20 +48,23 @@ struct DataProvider {
 
     func updateRecipe(uuid: UUID, newRecipe: FoodRecipe, db: any Database) async throws -> FoodRecipe {
         try await db.transaction { currentDb in
-            guard let oldRecipe = try await DBRecipeEntry
+            guard let dbRecipe = try await DBRecipeEntry
                 .query(on: currentDb)
                 .filter(\.$id == uuid)
                 .first() else {
                 throw CommonRequestError.notFound
             }
 
-            try await DBRecipeEntry
-                .query(on: currentDb)
-                .filter(\.$id == uuid)
-                .delete()
+            dbRecipe.name = newRecipe.name
+            dbRecipe.shortDescription = newRecipe.shortDescription
+            dbRecipe.description = newRecipe.description
+            dbRecipe.tags = newRecipe.tags
+            try await dbRecipe.update(on: currentDb)
 
-            let dbRecipe = newRecipe.toDBObject()
-            try await dbRecipe.save(on: currentDb)
+            try await DBRecipeProductEntry
+                .query(on: currentDb)
+                .filter(\.$recipe.$id == uuid)
+                .delete()
 
             let dbProductEntries = newRecipe.products.map { recipeEntry in
                 recipeEntry.toDBObject(parentRecipe: dbRecipe)
@@ -70,7 +73,11 @@ struct DataProvider {
             for currentEntry in dbProductEntries {
                 try await currentEntry.save(on: currentDb)
             }
-            return newRecipe
+
+            guard let savedRecipe = try await getRecipeById(uuid: uuid, db: currentDb) else {
+                throw CommonRequestError.notFound
+            }
+            return savedRecipe
         }
     }
 }
