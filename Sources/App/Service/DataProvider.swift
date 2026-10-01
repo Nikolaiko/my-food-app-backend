@@ -51,6 +51,10 @@ struct DataProvider {
             dbRecipe.shortDescription = newRecipe.shortDescription
             dbRecipe.description = newRecipe.description
             dbRecipe.tags = newRecipe.tags
+            dbRecipe.proteins = newRecipe.proteins
+            dbRecipe.fats = newRecipe.fats
+            dbRecipe.carbohydrates = newRecipe.carbohydrates
+            dbRecipe.calories = newRecipe.calories
             try await dbRecipe.update(on: currentDb)
 
             try await DBRecipeProductEntry

@@ -30,6 +30,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(AddRecipeTags())
     app.migrations.add(MoveCountToQuantities())
     app.migrations.add(MakeRecipeColumnsNotNull())
+    app.migrations.add(AddRecipeNutrition())
 
     try await app.autoMigrate()
 

@@ -6,7 +6,11 @@ extension FoodRecipeShortInfo {
             id: dbObject.id?.uuidString ?? "",
             name: dbObject.name,
             shortDescription: dbObject.shortDescription,
-            tags: dbObject.tags
+            tags: dbObject.tags,
+            proteins: dbObject.proteins,
+            fats: dbObject.fats,
+            carbohydrates: dbObject.carbohydrates,
+            calories: dbObject.calories
         )
     }
 }

@@ -9,7 +9,11 @@ extension FoodRecipe {
             shortDescription: dbObject.shortDescription,
             description: dbObject.description,
             products: dbObject.products.map { FoodRecipeProductEntry.fromDBObject(dbObject: $0) },
-            tags: dbObject.tags
+            tags: dbObject.tags,
+            proteins: dbObject.proteins,
+            fats: dbObject.fats,
+            carbohydrates: dbObject.carbohydrates,
+            calories: dbObject.calories
         )
     }
 }
