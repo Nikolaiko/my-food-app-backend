@@ -12,32 +12,4 @@ extension FoodRecipe {
             tags: dbObject.tags
         )
     }
-
-    func toDBObject() -> DBRecipeEntry {
-        DBRecipeEntry(
-            id: self.id.isEmpty ? nil : UUID(uuidString: self.id),
-            name: self.name,
-            shortDescription: self.shortDescription,
-            description: self.description,
-            tags: self.tags
-        )
-    }
-
-    func copy(
-        newId: String? = nil,
-        newName: String? = nil,
-        newShortDescription: String? = nil,
-        newDescription: String? = nil,
-        newTags: [Int]? = nil,
-        newProducts: [FoodRecipeProductEntry]? = nil
-    ) -> FoodRecipe {
-        FoodRecipe(
-            id: newId ?? id,
-            name: newName ?? name,
-            shortDescription: newShortDescription ?? shortDescription,
-            description: newDescription ?? description,
-            products: newProducts ?? products,
-            tags: newTags ?? tags
-        )
-    }
 }

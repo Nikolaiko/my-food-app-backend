@@ -2,11 +2,11 @@ openapi: 3.0.0
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/NIKOLAIKO_1/ProductsAndRecipes/1.0.3
+    url: https://virtserver.swaggerhub.com/NIKOLAIKO_1/ProductsAndRecipes/1.0.4
   - description: LiveServer
     url: http://e97b67a8bc6.vps.myjino.ru:49158
 info:
-  version: 1.0.3
+  version: 1.0.4
   title: recipes-products-app
   description: API for adding and getting recipes
 paths:
@@ -62,7 +62,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FoodRecipe'
+              $ref: '#/components/schemas/FoodRecipeUpdate'
       responses:
         '200':
           description: updated recipe data returned to client
@@ -168,7 +168,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FoodRecipe'
+              $ref: '#/components/schemas/NewFoodRecipe'
       responses:
         '200':
           description: newly recipe data returned to client
@@ -298,6 +298,62 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/FoodRecipeProductEntry'
+    NewFoodRecipe:
+        type: object
+        required: 
+          - name
+          - shortDescription
+          - description
+          - tags
+          - products
+        properties:
+          name: 
+            type: string
+            example: Овощной Салат
+          shortDescription:
+            type: string
+            example: "Овощной Салат"
+          description:
+            type: string
+            example: "Овощной Салат"
+          tags:
+            type: array
+            items:
+              type: integer
+          products:
+            type: array
+            items:
+              $ref: '#/components/schemas/NewFoodRecipeProductEntry'
+    FoodRecipeUpdate:
+        type: object
+        required: 
+          - id
+          - name
+          - shortDescription
+          - description
+          - tags
+          - products
+        properties:
+          id:
+            type: string
+            example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+          name: 
+            type: string
+            example: Овощной Салат
+          shortDescription:
+            type: string
+            example: "Овощной Салат"
+          description:
+            type: string
+            example: "Овощной Салат"
+          tags:
+            type: array
+            items:
+              type: integer
+          products:
+            type: array
+            items:
+              $ref: '#/components/schemas/NewFoodRecipeProductEntry'
     FoodProductsList:
       type: array
       items:
@@ -339,6 +395,19 @@ components:
         id:
           type: string
           example: "59E038B3-629B-4749-88EB-F09234D87BBB"
+        productType:
+          $ref: '#/components/schemas/FoodProductType'
+        quantities:
+          type: array
+          description: the same amount in different units, e.g. 4 items or 500 g
+          items:
+            $ref: '#/components/schemas/FoodRecipeQuantity'
+    NewFoodRecipeProductEntry:
+      type: object
+      required:
+        - productType
+        - quantities
+      properties:
         productType:
           $ref: '#/components/schemas/FoodProductType'
         quantities:
