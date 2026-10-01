@@ -22,18 +22,38 @@ final class DBRecipeEntry: Model,  @unchecked Sendable {
     @Field(key: "tags")
     var tags: [Int]
 
+    @OptionalField(key: "proteins")
+    var proteins: Double?
+
+    @OptionalField(key: "fats")
+    var fats: Double?
+
+    @OptionalField(key: "carbohydrates")
+    var carbohydrates: Double?
+
+    @OptionalField(key: "calories")
+    var calories: Double?
+
     init() { }
 
     init(id: UUID? = nil,
          name: String,
          shortDescription: String,
          description: String,
-         tags: [Int]
+         tags: [Int],
+         proteins: Double?,
+         fats: Double?,
+         carbohydrates: Double?,
+         calories: Double?
     ) {
         self.id = id
         self.name = name
         self.shortDescription = shortDescription
         self.description = description
         self.tags = tags
+        self.proteins = proteins
+        self.fats = fats
+        self.carbohydrates = carbohydrates
+        self.calories = calories
     }
 }

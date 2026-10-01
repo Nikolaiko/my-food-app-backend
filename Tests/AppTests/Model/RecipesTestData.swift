@@ -12,7 +12,11 @@ enum RecipesTestData {
         shortDescription: "Яблоки",
         description: "Про яблоки в тесте",
         products: [RecipesTestData.testProductItem],
-        tags: []
+        tags: [],
+        proteins: 0.4,
+        fats: 0.2,
+        carbohydrates: 11.8,
+        calories: 52
     )
 
     static let notExistingUUID = "13E038B3-629B-4749-88EB-F09234D87567"

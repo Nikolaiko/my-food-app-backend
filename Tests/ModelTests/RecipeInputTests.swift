@@ -36,7 +36,11 @@ struct RecipeInputTests {
             shortDescription: "Кратко",
             description: "Полно",
             products: [NewFoodRecipeProductEntry(productType: .tomato, quantities: [])],
-            tags: []
+            tags: [],
+            proteins: nil,
+            fats: nil,
+            carbohydrates: nil,
+            calories: nil
         )
         let json = String(decoding: try JSONEncoder().encode(recipe), as: UTF8.self)
         #expect(!json.contains(#""id""#))

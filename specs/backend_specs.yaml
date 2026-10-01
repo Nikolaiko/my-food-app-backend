@@ -268,6 +268,26 @@ components:
           type: array
           items:
             type: integer
+        proteins:
+          type: number
+          format: double
+          description: proteins per serving, g
+          example: 12.5
+        fats:
+          type: number
+          format: double
+          description: fats per serving, g
+          example: 8
+        carbohydrates:
+          type: number
+          format: double
+          description: carbohydrates per serving, g
+          example: 30.5
+        calories:
+          type: number
+          format: double
+          description: energy per serving, kcal
+          example: 245
     FoodRecipe:
         type: object
         required: 
@@ -294,6 +314,26 @@ components:
             type: array
             items:
               type: integer
+          proteins:
+            type: number
+            format: double
+            description: proteins per serving, g
+            example: 12.5
+          fats:
+            type: number
+            format: double
+            description: fats per serving, g
+            example: 8
+          carbohydrates:
+            type: number
+            format: double
+            description: carbohydrates per serving, g
+            example: 30.5
+          calories:
+            type: number
+            format: double
+            description: energy per serving, kcal
+            example: 245
           products:
             type: array
             items:
@@ -320,6 +360,26 @@ components:
             type: array
             items:
               type: integer
+          proteins:
+            type: number
+            format: double
+            description: proteins per serving, g
+            example: 12.5
+          fats:
+            type: number
+            format: double
+            description: fats per serving, g
+            example: 8
+          carbohydrates:
+            type: number
+            format: double
+            description: carbohydrates per serving, g
+            example: 30.5
+          calories:
+            type: number
+            format: double
+            description: energy per serving, kcal
+            example: 245
           products:
             type: array
             items:
@@ -350,6 +410,26 @@ components:
             type: array
             items:
               type: integer
+          proteins:
+            type: number
+            format: double
+            description: proteins per serving, g
+            example: 12.5
+          fats:
+            type: number
+            format: double
+            description: fats per serving, g
+            example: 8
+          carbohydrates:
+            type: number
+            format: double
+            description: carbohydrates per serving, g
+            example: 30.5
+          calories:
+            type: number
+            format: double
+            description: energy per serving, kcal
+            example: 245
           products:
             type: array
             items:

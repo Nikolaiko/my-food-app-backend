@@ -120,6 +120,13 @@ routes.swift
 `{ "count": 500, "quantityMeasure": 1 }`: одно и то же количество в разных
 единицах (например, 4 шт или 500 г). Массив может быть пустым.
 
+**Пищевая ценность рецепта** — `proteins`, `fats`, `carbohydrates` (г) и
+`calories` (ккал) на порцию, дробные числа, задаются вручную. Поля
+необязательные: не указанное значение в ответе отсутствует, в запросе его можно
+не передавать или передать `null`; `0` — настоящее значение. Есть в
+`FoodRecipe`, `FoodRecipeShortInfo` и входных моделях. `PUT` без этих полей
+сбрасывает их.
+
 **Дата продукта** `FoodProduct.date` — день покупки строкой `YYYY-MM-DD`
 (`"2026-07-12"`), как `format: date` в спеке. Откуда берётся день — в
 [Про данные чека](#про-данные-чека).
@@ -158,6 +165,7 @@ PostgreSQL, схема создаётся миграциями (порядок �
 | `AddRecipeTags` | Добавляет в `recipe` колонку `tags` (`bigint[]`, по умолчанию пустой массив) |
 | `MoveCountToQuantities` | Заменяет `count` и `quantityMeasure` в `recipe-product-entry` колонкой `quantities` (`jsonb[]`): старая пара становится единственным элементом массива |
 | `MakeRecipeColumnsNotNull` | Запрещает NULL в `name`, `description`, `shortDescription` таблицы `recipe` и в `recipe-product-entry.productType`; найденные NULL заменяет на пустую строку и `Unknown` |
+| `AddRecipeNutrition` | Добавляет в `recipe` nullable-колонки `proteins`, `fats`, `carbohydrates`, `calories` (`double precision`); у существующих рецептов они `NULL` |
 
 `productType` хранится строкой (raw value `FoodProductType`), `quantities` —
 массивом JSON-объектов `{"count": …, "quantityMeasure": …}` (`quantityMeasure` —
