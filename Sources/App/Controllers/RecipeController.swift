@@ -40,7 +40,7 @@ class RecipeController: RouteCollection {
 
     private func updateRecipeById(request: Request) async throws -> FoodRecipe {
         try checkAuthorization(request: request)
-        guard let parsedRecipe = try? request.content.decode(FoodRecipe.self),
+        guard let parsedRecipe = try? request.content.decode(FoodRecipeUpdate.self),
               let uuid = UUID(uuidString: parsedRecipe.id) else {
             throw CommonRequestError.unableToParseParameter(ParameterNames.recipeInBody)
         }
@@ -54,7 +54,7 @@ class RecipeController: RouteCollection {
 
     private func addRecipe(request: Request) async throws -> FoodRecipe {
         try checkAuthorization(request: request)
-        guard let parsedRecipe = try? request.content.decode(FoodRecipe.self) else {
+        guard let parsedRecipe = try? request.content.decode(NewFoodRecipe.self) else {
             throw CommonRequestError.unableToParseParameter(ParameterNames.recipeInBody)
         }
         return try await provider.addNewRecipe(

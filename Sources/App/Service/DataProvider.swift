@@ -21,7 +21,7 @@ struct DataProvider {
         return recipiesObjects.map { FoodRecipeShortInfo.fromDBObject(dbObject: $0) }
     }
 
-    func addNewRecipe(newRecipe: FoodRecipe, db: any Database) async throws -> FoodRecipe {
+    func addNewRecipe(newRecipe: NewFoodRecipe, db: any Database) async throws -> FoodRecipe {
         try await db.transaction { currentDb in
             let dbRecipe = newRecipe.toDBObject()
             try await dbRecipe.save(on: currentDb)
@@ -31,22 +31,14 @@ struct DataProvider {
                 try await currentEntry.save(on: currentDb)
             }
 
-            var productItemsWithId: [FoodRecipeProductEntry] = []
-            for index in (0..<dbProductEntries.count) {
-                productItemsWithId.append(
-                    newRecipe.products[index].copy(newId: dbProductEntries[index].id?.uuidString)
-                )
+            guard let savedRecipe = try await getRecipeById(uuid: try dbRecipe.requireID(), db: currentDb) else {
+                throw CommonRequestError.notFound
             }
-
-            let recipeWithId = newRecipe.copy(
-                newId: dbRecipe.id?.uuidString,
-                newProducts: productItemsWithId
-            )
-            return recipeWithId
+            return savedRecipe
         }
     }
 
-    func updateRecipe(uuid: UUID, newRecipe: FoodRecipe, db: any Database) async throws -> FoodRecipe {
+    func updateRecipe(uuid: UUID, newRecipe: FoodRecipeUpdate, db: any Database) async throws -> FoodRecipe {
         try await db.transaction { currentDb in
             guard let dbRecipe = try await DBRecipeEntry
                 .query(on: currentDb)

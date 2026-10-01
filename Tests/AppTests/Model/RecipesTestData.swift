@@ -2,14 +2,12 @@ import Foundation
 import Model
 
 enum RecipesTestData {
-    static let testProductItem = FoodRecipeProductEntry(
-        id: "",
+    static let testProductItem = NewFoodRecipeProductEntry(
         productType: FoodProductType.apple,
         quantities: [FoodRecipeQuantity(count: 2, quantityMeasure: FoodQuantityType.item)]
     )
 
-    static let testRecipe = FoodRecipe(
-        id: "",
+    static let testRecipe = NewFoodRecipe(
         name: "Яблочный рецепт",
         shortDescription: "Яблоки",
         description: "Про яблоки в тесте",
@@ -23,14 +21,12 @@ enum RecipesTestData {
     static let newDescription = "Новое описание"
     static let newProductsCount = 2
 
-    static let newFirstProductItem = FoodRecipeProductEntry(
-        id: "",
+    static let newFirstProductItem = NewFoodRecipeProductEntry(
         productType: FoodProductType.cottage,
         quantities: [FoodRecipeQuantity(count: 4, quantityMeasure: FoodQuantityType.item)]
     )
 
-    static let newSecondProductItem = FoodRecipeProductEntry(
-        id: "",
+    static let newSecondProductItem = NewFoodRecipeProductEntry(
         productType: FoodProductType.bellpepper,
         quantities: [FoodRecipeQuantity(count: 4, quantityMeasure: FoodQuantityType.weight)]
     )
