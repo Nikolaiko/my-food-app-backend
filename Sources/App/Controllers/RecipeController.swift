@@ -3,7 +3,7 @@ import Vapor
 import Model
 import FluentKit
 
-class RecipeController: RouteCollection {
+struct RecipeController: RouteCollection {
     private let provider = DataProvider()
 
     func boot(routes: Vapor.RoutesBuilder) throws {
