@@ -15,13 +15,14 @@ public func configure(_ app: Application) async throws {
         databasePort = productionDatabasePort
     }
 
-    app.databases.use(.postgres(
+    app.databases.use(.postgres(configuration: SQLPostgresConfiguration(
         hostname: Environment.get("DATABASE_HOST") ?? "localhost",
         port: databasePort,
         username: Environment.get("DATABASE_USERNAME") ?? "root",
         password: Environment.get("DATABASE_PASSWORD") ?? "root",
-        database: Environment.get("DATABASE_NAME") ?? databaseName
-    ), as: .psql)
+        database: Environment.get("DATABASE_NAME") ?? databaseName,
+        tls: .disable
+    )), as: .psql)
 
     // Migrations
     app.migrations.add(CreateDBSchema())

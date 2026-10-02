@@ -3,7 +3,7 @@ import Vapor
 import Model
 import FluentKit
 
-class ReceiptsController: RouteCollection {
+struct ReceiptsController: RouteCollection {
     private let networkService = QRDataParsingNetworkService()
     private let parser = SimpleProductsParser()
 
