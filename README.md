@@ -270,8 +270,9 @@ docker run -d --name food-db-test -p 5433:5432 \
   postgres:16-alpine
 ```
 
-> Сейчас все тесты рецептов (`Tests/AppTests/Recipes`) закомментированы — их
-> нужно актуализировать под async-API Vapor и `quantities` у продуктов.
+Без этой базы тесты рецептов (`AppTests/Recipes`, XCTest + XCTVapor) падают.
+Каждый тест поднимает приложение через `Application.withTestable`, который
+гасит его и при ошибке.
 
 ## Планы и известные ограничения
 
@@ -279,5 +280,5 @@ docker run -d --name food-db-test -p 5433:5432 \
 - Проверять `Auth` в `/receipts/parse`, как того требует спека.
 - Заменить общий ключ на пользовательскую аутентификацию (сейчас `login`/`register`
   в клиенте — мок).
-- Вернуть тесты и добавить CI на прогон `swift test`.
+- Добавить CI на прогон `swift test` (с тестовым PostgreSQL).
 - Зависимость `fluent-mongo-driver` подключена, но не используется.
