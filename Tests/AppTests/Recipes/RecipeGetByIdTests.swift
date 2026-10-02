@@ -5,86 +5,67 @@ import Model
 
 final class RecipeGetByIdTests: XCTestCase {
 
-//    func testGetRecipeById() async throws {
-//        let app = Application(.testing)
-//        defer { app.shutdown() }
-//        try await configure(app)
-//
-//        try await app.autoRevert().get()
-//        try await app.autoMigrate().get()
-//
-//        try app.test(.POST, "/recipes/add", beforeRequest: { preRequest in
-//            try preRequest.content.encode(RecipesTestData.testRecipe)
-//            preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
-//        }, afterResponse: { addResponse in
-//            XCTAssertEqual(addResponse.status, .ok)
-//
-//            let addedRecipe = try addResponse.content.decode(FoodRecipe.self)
-//            try app.test(.GET, "recipes/\(addedRecipe.id)", beforeRequest: { preRequest in
-//                preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
-//            }, afterResponse: { fullDataResponse in
-//                XCTAssertEqual(fullDataResponse.status, .ok)
-//
-//                let newRecipe = try fullDataResponse.content.decode(FoodRecipe.self)
-//
-//                //Test recipe
-//                XCTAssertEqual(newRecipe.name, RecipesTestData.testRecipe.name)
-//                XCTAssertEqual(newRecipe.shortDescription, RecipesTestData.testRecipe.shortDescription)
-//                XCTAssertEqual(newRecipe.description, RecipesTestData.testRecipe.description)
-//                XCTAssertTrue(newRecipe.tags.isEmpty)
-//                XCTAssertEqual(newRecipe.products.count, RecipesTestData.testRecipe.products.count)
-//
-//                //Test product
-//                guard let product = newRecipe.products.first else {
-//                    XCTFail("No products in new recipe")
-//                    return
-//                }
-//
-//                XCTAssertEqual(product.count, RecipesTestData.testRecipe.products[0].count)
-//                XCTAssertEqual(product.productType, RecipesTestData.testRecipe.products[0].productType)
-//                XCTAssertEqual(product.quantityMeasure, RecipesTestData.testRecipe.products[0].quantityMeasure)
-//            })
-//        })
-//    }
-//
-//    func testGetRecipeByIdRecipeNotFoundError() async throws {
-//        let app = try await Application.testable()
-//        defer { app.shutdown() }
-//
-//        try app.test(.GET, "/recipes/\(RecipesTestData.notExistingUUID)", beforeRequest: { preRequest in
-//            preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
-//        }, afterResponse: { afterRequest in
-//            XCTAssert(
-//                afterRequest.status == .notFound,
-//                "Ожидаемый статус: \(HTTPStatus.notFound), полученный: \(afterRequest.status)"
-//            )
-//        })
-//    }
-//
-//    func testGetRecipeByIdRecipeBadRequestError() async throws {
-//        let app = try await Application.testable()
-//        defer { app.shutdown() }
-//
-//        try app.test(.GET, "/recipes/\(RecipesTestData.malformedgUUID)") { preRequest in
-//            try preRequest.content.encode(RecipesTestData.testDummyEntity)
-//            preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
-//        } afterResponse: { afterRequest in
-//            XCTAssert(
-//                afterRequest.status == .badRequest,
-//                "Ожидаемый статус: \(HTTPStatus.badRequest), полученный: \(afterRequest.status)"
-//            )
-//        }
-//    }
-//
-//    func testGetRecipeByIdNotAuthError() async throws {
-//        let app = try await Application.testable()
-//        defer { app.shutdown() }
-//
-//        try app.test(.GET, "/recipes/\(RecipesTestData.notExistingUUID)", afterResponse: { afterRequest in
-//            XCTAssert(
-//                afterRequest.status == .unauthorized,
-//                "Ожидаемый статус: \(HTTPStatus.notFound), полученный: \(afterRequest.status)"
-//            )
-//        })
-//    }
+    func testGetRecipeById() async throws {
+        try await Application.withTestable { app in
+            let addedRecipe = try await app.addRecipe(RecipesTestData.testRecipe)
+
+            try await app.test(.GET, "/recipes/\(addedRecipe.id)") { preRequest async throws in
+                preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
+            } afterResponse: { response async throws in
+                XCTAssertEqual(response.status, .ok)
+
+                let recipe = try response.content.decode(FoodRecipe.self)
+                let expected = RecipesTestData.testRecipe
+
+                XCTAssertEqual(recipe.id, addedRecipe.id)
+                XCTAssertEqual(recipe.name, expected.name)
+                XCTAssertEqual(recipe.shortDescription, expected.shortDescription)
+                XCTAssertEqual(recipe.description, expected.description)
+                XCTAssertEqual(recipe.tags, expected.tags)
+                XCTAssertEqual(recipe.proteins, expected.proteins)
+                XCTAssertEqual(recipe.fats, expected.fats)
+                XCTAssertEqual(recipe.carbohydrates, expected.carbohydrates)
+                XCTAssertEqual(recipe.calories, expected.calories)
+                XCTAssertEqual(recipe.products.count, expected.products.count)
+
+                let product = try XCTUnwrap(recipe.products.first)
+                let expectedProduct = expected.products[0]
+                XCTAssertEqual(product.id, addedRecipe.products.first?.id)
+                XCTAssertEqual(product.productType, expectedProduct.productType)
+                XCTAssertEqual(product.quantities.map(\.count), expectedProduct.quantities.map(\.count))
+                XCTAssertEqual(
+                    product.quantities.map(\.quantityMeasure),
+                    expectedProduct.quantities.map(\.quantityMeasure)
+                )
+            }
+        }
+    }
+
+    func testGetRecipeByIdRecipeNotFoundError() async throws {
+        try await Application.withTestable { app in
+            try await app.test(.GET, "/recipes/\(RecipesTestData.notExistingUUID)") { preRequest async throws in
+                preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
+            } afterResponse: { response async throws in
+                XCTAssertEqual(response.status, .notFound)
+            }
+        }
+    }
+
+    func testGetRecipeByIdRecipeBadRequestError() async throws {
+        try await Application.withTestable { app in
+            try await app.test(.GET, "/recipes/\(RecipesTestData.malformedgUUID)") { preRequest async throws in
+                preRequest.headers.add(name: authHeaderName, value: headerAuthValue)
+            } afterResponse: { response async throws in
+                XCTAssertEqual(response.status, .badRequest)
+            }
+        }
+    }
+
+    func testGetRecipeByIdNotAuthError() async throws {
+        try await Application.withTestable { app in
+            try await app.test(.GET, "/recipes/\(RecipesTestData.notExistingUUID)") { response async throws in
+                XCTAssertEqual(response.status, .unauthorized)
+            }
+        }
+    }
 }

@@ -12,7 +12,7 @@ enum RecipesTestData {
         shortDescription: "Яблоки",
         description: "Про яблоки в тесте",
         products: [RecipesTestData.testProductItem],
-        tags: [],
+        tags: [1, 2],
         proteins: 0.4,
         fats: 0.2,
         carbohydrates: 11.8,
@@ -24,6 +24,9 @@ enum RecipesTestData {
     static let newName = "Новый овощной салат"
     static let newDescription = "Новое описание"
     static let newProductsCount = 2
+    static let newTags = [3]
+    static let newProteins = 5.5
+    static let newCalories = 120.0
 
     static let newFirstProductItem = NewFoodRecipeProductEntry(
         productType: FoodProductType.cottage,
